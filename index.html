@@ -3,22 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHRED.LOG | 执教性能系统</title>
+    <title>SHRED.LOG | 进化实验室</title>
     <style>
         :root {
             --black: #000000; --white: #ffffff; --orange: #ff4400; 
             --blue: #007aff; --gray-bg: #f9f9f9; --border: #eeeeee;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'SF Pro Display', -apple-system, 'Helvetica Neue', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif; }
         body { background: var(--white); color: var(--black); padding: 20px; min-height: 100vh; }
         
-        /* 学员切换器 - 极简置顶 */
-        .client-switcher { background: #f4f4f4; padding: 8px 25px; display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #ddd; margin: -20px -20px 30px -20px; }
-        .switch-btn { padding: 4px 12px; border: 1px solid #ccc; cursor: pointer; font-size: 11px; font-weight: 900; background: #fff; border-radius: 2px; }
-        .switch-btn.active { background: var(--black); color: #fff; border-color: var(--black); }
+        /* 顶部进度条 */
+        .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 6px; background: #eee; z-index: 2000; }
+        #goal-progress-bar { width: 0%; height: 100%; background: var(--orange); transition: width 0.8s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 0 10px rgba(255, 68, 0, 0.5); }
 
-        /* Header - 保持专业排版 */
         header { border-bottom: 8px solid var(--black); padding-bottom: 20px; margin-bottom: 0px; display: grid; grid-template-columns: 1.5fr 4fr; gap: 30px; }
         .brand h1 { font-size: 3.5rem; font-weight: 950; letter-spacing: -4px; line-height: 0.8; }
         .brand p { font-weight: 800; color: var(--orange); text-transform: uppercase; font-size: 0.8rem; margin-top: 8px; letter-spacing: 1.5px; }
@@ -27,211 +25,157 @@
         .meta-box { border-left: 1px solid #ddd; padding-left: 15px; }
         .m-label { font-size: 0.6rem; font-weight: 900; color: #999; text-transform: uppercase; margin-bottom: 5px; }
         .m-val { font-size: 1.2rem; font-weight: 900; outline: none; }
+        .m-val-goal { color: var(--orange); }
 
-        /* 还原截图中的黑色日期条 */
-        .global-controls { 
-            background: #1a1a1a; color: var(--white); 
-            padding: 15px 25px; margin: 20px 0 30px 0; 
-            display: flex; align-items: center; gap: 20px; 
-            font-size: 0.85rem; font-weight: 700;
-        }
-        input[type="date"] { background: #333; color: white; border: none; padding: 5px 10px; font-weight: bold; cursor: pointer; outline: none; border-radius: 4px; font-size: 14px; }
+        .global-controls { background: #1a1a1a; color: var(--white); padding: 15px 25px; margin: 20px 0 30px 0; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; font-weight: 700; }
+        input[type="date"] { background: #333; color: white; border: none; padding: 5px 10px; font-weight: bold; cursor: pointer; outline: none; border-radius: 4px; }
 
-        /* 周计划网格 */
         .weekly-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
         @media (max-width: 1400px) { .weekly-grid { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); } }
 
         .day-card { border: 1px solid #eee; padding: 18px; border-radius: 4px; background: #fff; transition: 0.3s; }
-        .day-card:hover { border-color: #000; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        
-        /* 还原截图中的卡片头部 */
         .day-header { border-bottom: 3px solid var(--black); padding-bottom: 8px; margin-bottom: 15px; position: relative; }
         .d-date { font-size: 0.7rem; font-weight: 900; color: var(--orange); letter-spacing: 1px; }
         .d-name { font-size: 1.5rem; font-weight: 950; letter-spacing: -1px; line-height: 1; }
 
         .day-weight-box { position: absolute; top: 0; right: 0; text-align: right; }
-        .dw-label { font-size: 0.55rem; font-weight: 900; color: #999; }
         .dw-input { font-size: 1.2rem; font-weight: 900; border-bottom: 2px dashed #000; outline: none; display: inline-block; min-width: 45px; }
         .dw-diff { font-size: 0.75rem; font-weight: 900; color: var(--orange); }
 
-        /* 状态滑块 */
         .status-box { margin-bottom: 12px; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
         .slider-group { margin-bottom: 6px; }
         .slider-label { font-size: 0.6rem; font-weight: 900; color: #666; display: flex; justify-content: space-between; }
         input[type="range"] { width: 100%; height: 4px; accent-color: var(--orange); cursor: pointer; }
 
-        /* 能量与饮水 */
         .energy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; background: #fafafa; padding: 10px; border: 1px solid #f0f0f0; }
         .e-label { font-size: 0.55rem; font-weight: 900; color: #999; text-transform: uppercase; text-align: center; }
         .e-val { font-size: 1rem; font-weight: 900; text-align: center; outline: none; }
         .e-gap { grid-column: span 2; border-top: 1px solid #eee; padding-top: 5px; text-align: center; color: var(--orange); font-weight: 900; font-size: 0.75rem; }
         .water-box { grid-column: span 2; border-top: 1px dashed #ddd; padding-top: 5px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* 标题排版 */
-        .section-header { 
-            font-size: 0.75rem; font-weight: 950; text-transform: uppercase; 
-            color: var(--orange); margin: 15px 0 8px 0; 
-            border-left: 3px solid var(--orange); padding-left: 8px;
-        }
-
+        .section-header { font-size: 0.75rem; font-weight: 950; text-transform: uppercase; color: var(--orange); margin: 15px 0 8px 0; border-left: 3px solid var(--orange); padding-left: 8px; }
         .diet-timeline { margin-bottom: 15px; }
         .diet-row { display: grid; grid-template-columns: 45px 1fr; gap: 8px; margin-bottom: 4px; }
-        .t-time { font-size: 0.7rem; font-weight: 900; color: #bbb; }
         .t-content { font-size: 0.85rem; font-weight: 600; outline: none; border-bottom: 1px solid #f2f2f2; }
 
-        /* 训练计划与总结 */
-        .training-card, .summary-card { 
-            background: #fdfdfd; border: 1px solid #f4f4f4; border-radius: 2px; padding: 12px; 
-            font-size: 0.9rem; font-weight: 600; color: #222; line-height: 1.6; 
-            white-space: pre-wrap; outline: none;
-        }
+        .training-card, .summary-card { background: #fdfdfd; border: 1px solid #f4f4f4; border-radius: 2px; padding: 12px; font-size: 0.9rem; font-weight: 600; color: #222; line-height: 1.6; white-space: pre-wrap; outline: none; }
         .training-card { min-height: 120px; border-left: 3px solid #000; }
         .summary-card { min-height: 80px; background: #fffcf0; font-style: italic; border-left: 3px solid #666; }
 
-        /* 幽灵工具栏（鼠标到下方才出现） */
-        .toolbar-trigger { position: fixed; bottom: 0; left: 0; right: 0; height: 80px; z-index: 999; }
-        .toolbar { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px); 
-            display: flex; gap: 12px; z-index: 1000; 
-            background: var(--black); padding: 12px 25px; border-radius: 100px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
-            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); 
-            opacity: 0;
-        }
-        .toolbar-trigger:hover + .toolbar, .toolbar:hover { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toolbar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 1000; background: var(--black); padding: 12px 25px; border-radius: 100px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
         button.tool-btn { background: #333; color: #fff; border: 1px solid #444; padding: 8px 18px; font-weight: 900; border-radius: 50px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; }
         button.tool-btn:hover { background: var(--orange); border-color: var(--orange); }
-
-        @media print { .toolbar, .global-controls, .client-switcher, .toolbar-trigger { display: none; } body { padding: 0; } }
     </style>
 </head>
 <body>
 
-<div class="client-switcher">
-    <button class="switch-btn" id="btn-client-A" onclick="switchClient('A')">学员 A (档案 1)</button>
-    <button class="switch-btn" id="btn-client-B" onclick="switchClient('B')">学员 B (档案 2)</button>
-</div>
+<div class="progress-container"><div id="goal-progress-bar"></div></div>
 
 <header>
-    <div class="brand"><h1>SHRED.LOG</h1><p>Professional Performance</p></div>
+    <div class="brand"><h1>SHRED.LOG</h1><p>Evolutionary Fitness</p></div>
     <div class="meta-grid">
-        <div class="meta-box"><div class="m-label">Height / 身高 (cm)</div><div class="m-val" contenteditable="true" id="h-val">175</div></div>
-        <div class="meta-box"><div class="m-label">Base Weight / 基准体重</div><div class="m-val" contenteditable="true" id="w-val">80.0</div></div>
-        <div class="meta-box"><div class="m-label">BMI 指数</div><div class="m-val" id="bmi-val" style="color:var(--orange)">--</div></div>
-        <div class="meta-box"><div class="m-label">Client / 学员</div><div class="m-val" contenteditable="true" id="client-name">学员姓名</div></div>
-        <div class="meta-box"><div class="m-label">Coach / 教练</div><div class="m-val" contenteditable="true" id="coach-name">COACH.221</div></div>
+        <div class="meta-box"><div class="m-label">Height / 身高 (cm)</div><div class="m-val" contenteditable="true" id="h-val">180</div></div>
+        <div class="meta-box"><div class="m-label">Base / 起始 (kg)</div><div class="m-val" contenteditable="true" id="w-val">72.0</div></div>
+        <div class="meta-box"><div class="m-label">Goal / 目标 (kg)</div><div class="m-val m-val-goal" contenteditable="true" id="target-val">70.0</div></div>
+        <div class="meta-box"><div class="m-label">BMI 指数</div><div class="m-val" id="bmi-val">--</div></div>
+        <div class="meta-box"><div class="m-label">User / 用户</div><div class="m-val" contenteditable="true" id="user-name">用户名</div></div>
     </div>
 </header>
 
 <div class="global-controls">
-    <span>计划起始日设定：</span><input type="date" id="start-date">
+    <span>周期起始日设定：</span><input type="date" id="start-date" onchange="renderGrid(); recalc();">
+    <span id="dist-label" style="color:var(--orange)">等待数据...</span>
 </div>
 
 <div class="weekly-grid" id="week-container"></div>
 
-<div class="toolbar-trigger"></div>
 <div class="toolbar">
-    <button class="tool-btn" onclick="saveAll()">💾 保存计划</button>
-    <button class="tool-btn" onclick="exportData()">📤 导出码</button>
-    <button class="tool-btn" onclick="importData()">📥 导入码</button>
-    <button class="tool-btn" style="background:#fff; color:#000;" onclick="window.print()">📄 打印 PDF</button>
+    <button class="tool-btn" onclick="saveData()">💾 保存</button>
+    <button class="tool-btn" onclick="exportData()">📤 导出</button>
+    <button class="tool-btn" onclick="importData()">📥 导入</button>
+    <button class="tool-btn" style="background:#fff; color:#000;" onclick="window.print()">📄 PDF</button>
 </div>
 
 <script>
-    let currentClientID = localStorage.getItem('active-client') || 'A';
-    const WEEKDAYS = ['周日 SUN', '周一 MON', '周二 TUE', '周三 WED', '周四 THU', '周五 FRI', '周六 SAT'];
-    const defaultDiet = ['08:00', '12:00', '16:00', '20:00'];
-
-    function switchClient(id) { currentClientID = id; localStorage.setItem('active-client', id); location.reload(); }
+    const WEEKDAYS = ['周一 MON', '周二 TUE', '周三 WED', '周四 THU', '周五 FRI', '周六 SAT', '周日 SUN'];
 
     function init() {
-        document.getElementById(`btn-client-${currentClientID}`).classList.add('active');
-        const prefix = `client${currentClientID}_`;
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('start-date').value = localStorage.getItem(prefix + 'start-date') || today;
+        const d = new Date();
+        const monday = new Date(d.setDate(d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1)));
+        document.getElementById('start-date').value = localStorage.getItem('shred_start') || monday.toISOString().split('T')[0];
         
-        ['h-val', 'w-val', 'client-name', 'coach-name'].forEach(id => {
-            const val = localStorage.getItem(prefix + id);
+        ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => {
+            const val = localStorage.getItem('shred_' + id);
             if(val) document.getElementById(id).innerText = val;
         });
 
-        renderGrid(prefix);
-        recalcAll();
+        renderGrid();
+        recalc();
     }
 
-    function renderGrid(prefix) {
+    function renderGrid() {
         const container = document.getElementById('week-container');
         container.innerHTML = '';
         const start = new Date(document.getElementById('start-date').value);
-        const saved = JSON.parse(localStorage.getItem(prefix + 'content') || '{}');
+        const saved = JSON.parse(localStorage.getItem('shred_content') || '{}');
 
         for(let i=0; i<7; i++) {
-            const current = new Date(start);
-            current.setDate(start.getDate() + i);
-            const data = saved[i] || { weight:'', in:0, out:0, water:'2.5', mood:5, fatigue:3, diet:defaultDiet.map(t=>[t,'']), training:'', summary:'' };
+            const cur = new Date(start); cur.setDate(start.getDate() + i);
+            // 关键修复：加入默认值逻辑，防止 undefined 出现
+            const d = saved[i] || { w:'', in:0, out:0, water:'2.5', mood:5, fatigue:3, diet:[['',''],['',''],['',''],['','']], train:'', sum:'' };
 
             const card = document.createElement('div');
             card.className = 'day-card';
             card.innerHTML = `
                 <div class="day-header">
-                    <div class="d-date">${current.toLocaleDateString('zh-CN',{month:'2-digit',day:'2-digit'})}</div>
-                    <div class="d-name">${WEEKDAYS[current.getDay()]}</div>
-                    <div class="day-weight-box"><div class="dw-label">晨称体重</div><span class="dw-input" contenteditable="true" data-field="d-weight">${data.weight}</span><div class="dw-diff">--</div></div>
+                    <div class="d-date">${cur.toLocaleDateString('zh-CN',{month:'2-digit',day:'2-digit'})}</div>
+                    <div class="d-name">${WEEKDAYS[(cur.getDay()+6)%7]}</div>
+                    <div class="day-weight-box"><span class="dw-input" contenteditable="true" data-field="d-weight">${d.w || ''}</span><div class="dw-diff">--</div></div>
                 </div>
                 <div class="status-box">
-                    <div class="slider-group"><div class="slider-label"><span>Mood 心情</span><span>${data.mood}</span></div><input type="range" min="1" max="10" value="${data.mood}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
-                    <div class="slider-group"><div class="slider-label"><span>Fatigue 疲劳度</span><span>${data.fatigue}</span></div><input type="range" min="1" max="10" value="${data.fatigue}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
+                    <div class="slider-group"><div class="slider-label"><span>Mood 心情</span><span>${d.mood || 5}</span></div><input type="range" min="1" max="10" value="${d.mood || 5}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
+                    <div class="slider-group"><div class="slider-label"><span>Fatigue 疲劳度</span><span>${d.fatigue || 3}</span></div><input type="range" min="1" max="10" value="${d.fatigue || 3}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
                 </div>
                 <div class="energy-grid">
-                    <div class="e-item"><div class="e-label">摄入</div><div class="e-val" contenteditable="true" data-field="in">${data.in}</div></div>
-                    <div class="e-item"><div class="e-label">消耗</div><div class="e-val" contenteditable="true" data-field="out">${data.out}</div></div>
-                    <div class="e-gap">热量缺口: <span class="gap-val">0</span> kcal</div>
-                    <div class="water-box"><div style="font-size:0.55rem;font-weight:900;color:var(--blue)">WATER / 饮水</div><div><span contenteditable="true" data-field="water" style="font-weight:900;color:var(--blue)">${data.water}</span> <small style="color:var(--blue)">L</small></div></div>
+                    <div class="e-item"><div class="e-label">摄入</div><div class="e-val" contenteditable="true" data-field="in">${d.in || 0}</div></div>
+                    <div class="e-item"><div class="e-label">消耗</div><div class="e-val" contenteditable="true" data-field="out">${d.out || 0}</div></div>
+                    <div class="e-gap">缺口: <span class="gap-val">0</span> kcal</div>
+                    <div class="water-box"><div style="font-size:0.55rem;font-weight:900;color:var(--blue)">WATER</div><div><span contenteditable="true" data-field="water" style="font-weight:900;color:var(--blue)">${d.water || '2.5'}</span> <small style="color:var(--blue)">L</small></div></div>
                 </div>
                 <div class="section-header">Diet / 饮食安排</div>
-                <div class="diet-timeline">${data.diet.map(m=>`<div class="diet-row"><div class="t-time" contenteditable="true">${m[0]}</div><div class="t-content" contenteditable="true" data-field="meal">${m[1]}</div></div>`).join('')}</div>
+                <div class="diet-timeline">${(d.diet || [['',''],['',''],['',''],['','']]).map(m=>`<div class="diet-row"><div class="t-content" contenteditable="true" data-field="meal">${m[1] || ''}</div></div>`).join('')}</div>
                 <div class="section-header">Training / 训练执行</div>
-                <div class="training-card" contenteditable="true" data-field="training">${data.training}</div>
+                <div class="training-card" contenteditable="true" data-field="train">${d.train || ''}</div>
                 <div class="section-header">Reflection / 每日总结</div>
-                <div class="summary-card" contenteditable="true" data-field="summary">${data.summary}</div>
+                <div class="summary-card" contenteditable="true" data-field="sum">${d.sum || ''}</div>
             `;
             container.appendChild(card);
-            card.addEventListener('input', () => { updateGap(card); calcWeightDiff(card.querySelector('[data-field="d-weight"]')); });
-            updateGap(card); calcWeightDiff(card.querySelector('[data-field="d-weight"]'));
+            card.addEventListener('input', () => { updateGap(card); recalc(); });
+            updateGap(card);
         }
     }
 
-    function saveAll() {
-        const prefix = `client${currentClientID}_`;
-        const cards = document.querySelectorAll('.day-card');
-        const content = {};
-        cards.forEach((card, i) => {
-            const diet = [];
-            card.querySelectorAll('.diet-row').forEach(row => diet.push([row.querySelector('.t-time').innerText, row.querySelector('[data-field="meal"]').innerText]));
-            const sliders = card.querySelectorAll('input[type="range"]');
-            content[i] = { weight: card.querySelector('[data-field="d-weight"]').innerText, in: card.querySelector('[data-field="in"]').innerText, out: card.querySelector('[data-field="out"]').innerText, water: card.querySelector('[data-field="water"]').innerText, mood: sliders[0].value, fatigue: sliders[1].value, diet: diet, training: card.querySelector('[data-field="training"]').innerText, summary: card.querySelector('[data-field="summary"]').innerText };
-        });
-        localStorage.setItem(prefix + 'content', JSON.stringify(content));
-        ['h-val', 'w-val', 'client-name', 'coach-name'].forEach(id => localStorage.setItem(prefix+id, document.getElementById(id).innerText));
-        localStorage.setItem(prefix + 'start-date', document.getElementById('start-date').value);
-        alert(`已保存学员 ${currentClientID} 的档案`);
-    }
-
-    function recalcAll() {
+    function recalc() {
         const h = parseFloat(document.getElementById('h-val').innerText) / 100;
-        const w = parseFloat(document.getElementById('w-val').innerText);
-        if(h > 0 && w > 0) document.getElementById('bmi-val').innerText = (w / (h*h)).toFixed(1);
-        document.querySelectorAll('[data-field="d-weight"]').forEach(el => calcWeightDiff(el));
-    }
+        const bW = parseFloat(document.getElementById('w-val').innerText);
+        const tW = parseFloat(document.getElementById('target-val').innerText);
+        let lW = bW, hasV = false;
 
-    function calcWeightDiff(el) {
-        const baseline = parseFloat(document.getElementById('w-val').innerText);
-        const current = parseFloat(el.innerText);
-        const diffEl = el.nextElementSibling;
-        if(!isNaN(baseline) && !isNaN(current)) {
-            const diff = (current - baseline).toFixed(1);
-            diffEl.innerText = (diff > 0 ? '+' : '') + diff + 'kg';
-        } else { diffEl.innerText = '--'; }
+        document.querySelectorAll('[data-field="d-weight"]').forEach(el => {
+            const v = el.innerText.trim();
+            if(v !== "" && !isNaN(parseFloat(v))) {
+                lW = parseFloat(v); hasV = true;
+                const diff = (lW - bW).toFixed(1);
+                el.nextElementSibling.innerText = (diff > 0 ? '+' : '') + diff + 'kg';
+            } else { el.nextElementSibling.innerText = "--"; }
+        });
+
+        if(h > 0 && lW > 0) document.getElementById('bmi-val').innerText = (lW / (h*h)).toFixed(1);
+        if(!isNaN(bW) && !isNaN(tW) && bW !== tW) {
+            const prog = hasV ? Math.min(100, Math.max(0, (Math.abs(bW - lW) / Math.abs(bW - tW)) * 100)) : 0;
+            document.getElementById('goal-progress-bar').style.width = prog + '%';
+            document.getElementById('dist-label').innerText = hasV ? `完成度: ${Math.round(prog)}% (差 ${(lW - tW).toFixed(1)}kg)` : "等待数据...";
+        }
     }
 
     function updateGap(card) {
@@ -240,31 +184,47 @@
         card.querySelector('.gap-val').innerText = (cin - cout).toFixed(0);
     }
 
-    function updateWeek() { renderGrid(`client${currentClientID}_`); recalcAll(); }
+    function saveData() {
+        const cards = document.querySelectorAll('.day-card');
+        const content = {};
+        cards.forEach((card, i) => {
+            const diet = []; card.querySelectorAll('.diet-row').forEach(row => diet.push(['', row.querySelector('[data-field="meal"]').innerText]));
+            const s = card.querySelectorAll('input[type="range"]');
+            content[i] = { w:card.querySelector('[data-field="d-weight"]').innerText, in:card.querySelector('[data-field="in"]').innerText, out:card.querySelector('[data-field="out"]').innerText, water:card.querySelector('[data-field="water"]').innerText, mood:s[0].value, fatigue:s[1].value, diet:diet, train:card.querySelector('[data-field="train"]').innerText, sum:card.querySelector('[data-field="sum"]').innerText };
+        });
+        localStorage.setItem('shred_content', JSON.stringify(content));
+        ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => localStorage.setItem('shred_' + id, document.getElementById(id).innerText));
+        localStorage.setItem('shred_start', document.getElementById('start-date').value);
+        alert('数据已保存');
+    }
 
     function exportData() {
-        saveAll();
-        const prefix = `client${currentClientID}_`;
-        const d = { sd: document.getElementById('start-date').value, h: document.getElementById('h-val').innerText, w: document.getElementById('w-val').innerText, c: document.getElementById('client-name').innerText, coach: document.getElementById('coach-name').innerText, content: JSON.parse(localStorage.getItem(prefix + 'content')) };
-        const code = btoa(encodeURIComponent(JSON.stringify(d)));
-        navigator.clipboard.writeText(code).then(() => alert('同步码已复制到剪贴板'));
+        saveData();
+        const d = { start: document.getElementById('start-date').value, h: document.getElementById('h-val').innerText, w: document.getElementById('w-val').innerText, t: document.getElementById('target-val').innerText, u: document.getElementById('user-name').innerText, content: JSON.parse(localStorage.getItem('shred_content')) };
+        navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(d)))).then(() => alert('导出成功！'));
     }
 
     function importData() {
-        const code = prompt('粘贴同步码:');
-        if(!code) return;
+        const code = prompt('输入同步码:'); if(!code) return;
         try {
             const d = JSON.parse(decodeURIComponent(atob(code)));
-            const prefix = `client${currentClientID}_`;
-            document.getElementById('start-date').value = d.sd;
-            document.getElementById('h-val').innerText = d.h;
-            document.getElementById('w-val').innerText = d.w;
-            document.getElementById('client-name').innerText = d.c;
-            document.getElementById('coach-name').innerText = d.coach;
-            localStorage.setItem(prefix + 'content', JSON.stringify(d.content));
-            localStorage.setItem(prefix + 'start-date', d.sd);
-            renderGrid(prefix); recalcAll(); alert('同步成功');
-        } catch(e) { alert('同步码无效'); }
+            // 兼容性逻辑：如果是旧版数据，自动映射到新版字段
+            const finalStart = d.start || d.sd || new Date().toISOString().split('T')[0];
+            const finalH = d.h || "180";
+            const finalW = d.w || "72.0";
+            const finalT = d.t || d.tw || "70.0";
+            const finalU = d.u || d.c || "用户";
+            const finalContent = d.content || {};
+
+            document.getElementById('start-date').value = finalStart;
+            document.getElementById('h-val').innerText = finalH;
+            document.getElementById('w-val').innerText = finalW;
+            document.getElementById('target-val').innerText = finalT;
+            document.getElementById('user-name').innerText = finalU;
+
+            localStorage.setItem('shred_content', JSON.stringify(finalContent));
+            renderGrid(); recalc(); alert('导入成功，undefined 已修复');
+        } catch(e) { alert('同步码格式不匹配，请确认代码完整'); }
     }
 
     window.onload = init;
