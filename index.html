@@ -11,10 +11,11 @@
         
         /* 顶部进度条 */
         .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 8px; background: #eee; z-index: 2000; }
-        #goal-progress-bar { width: 0%; height: 100%; background: var(--orange); transition: width 1s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 0 15px rgba(255, 68, 0, 0.4); }
+        #goal-progress-bar { width: 0%; height: 100%; background: var(--orange); transition: width 1s ease; box-shadow: 0 0 15px rgba(255, 68, 0, 0.4); }
 
+        /* 顶部元数据：极致粗体 */
         header { border-bottom: 8px solid var(--black); padding-bottom: 20px; display: grid; grid-template-columns: 1.5fr 4fr; gap: 30px; }
-        .brand h1 { font-size: 3.5rem; font-weight: 950; letter-spacing: -4px; line-height: 0.8; }
+        .brand h1 { font-size: 3.5rem; font-weight: 950; letter-spacing: -4px; line-height: 0.8; text-transform: uppercase; }
         .brand p { font-weight: 800; color: var(--orange); text-transform: uppercase; font-size: 0.8rem; margin-top: 8px; letter-spacing: 1.5px; }
         
         .meta-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
@@ -23,48 +24,48 @@
         .m-val { font-size: 1.2rem; font-weight: 950; outline: none; }
 
         .global-controls { background: #1a1a1a; color: var(--white); padding: 15px 25px; margin: 20px 0 30px 0; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; font-weight: 700; }
-        input[type="date"] { background: #333; color: white; border: none; padding: 5px 10px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        input[type="date"] { background: #333; color: white; border: none; padding: 5px 10px; font-weight: bold; border-radius: 4px; outline: none; }
 
         .weekly-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
         @media (max-width: 1400px) { .weekly-grid { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); } }
 
+        /* 卡片设计 */
         .day-card { border: 1px solid #eee; padding: 18px; border-radius: 4px; background: #fff; transition: 0.3s; }
         .day-header { border-bottom: 3px solid var(--black); padding-bottom: 8px; margin-bottom: 15px; position: relative; }
-        .d-date { font-size: 0.7rem; font-weight: 900; color: var(--orange); letter-spacing: 1px; }
-        .d-name { font-size: 1.5rem; font-weight: 950; letter-spacing: -1px; line-height: 1; }
+        .d-date { font-size: 0.7rem; font-weight: 950; color: var(--orange); letter-spacing: 1px; }
+        .d-name { font-size: 1.6rem; font-weight: 950; letter-spacing: -1px; line-height: 1; }
         .day-weight-box { position: absolute; top: 0; right: 0; text-align: right; }
-        .dw-input { font-size: 1.2rem; font-weight: 950; border-bottom: 2px dashed #000; outline: none; display: inline-block; min-width: 45px; }
+        .dw-input { font-size: 1.3rem; font-weight: 950; border-bottom: 2px dashed #000; outline: none; display: inline-block; min-width: 45px; }
         .dw-diff { font-size: 0.75rem; font-weight: 900; color: var(--orange); }
 
-        .status-box { margin-bottom: 12px; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
         .slider-group { margin-bottom: 8px; }
-        .slider-label { font-size: 0.6rem; font-weight: 900; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .slider-label { font-size: 0.65rem; font-weight: 900; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
         input[type="range"] { width: 100%; accent-color: var(--orange); cursor: pointer; height: 4px; }
 
-        .energy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; background: #fafafa; padding: 10px; border: 1px solid #f0f0f0; }
-        .e-label { font-size: 0.55rem; font-weight: 900; color: #999; text-transform: uppercase; text-align: center; }
-        .e-val { font-size: 1.1rem; font-weight: 950; text-align: center; outline: none; }
-        .e-gap { grid-column: span 2; border-top: 1px solid #eee; padding-top: 5px; text-align: center; color: var(--orange); font-weight: 900; font-size: 0.75rem; }
+        /* 能量缺口区：还原“摄入”与“消耗” */
+        .energy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; background: #fafafa; padding: 10px; border: 1px solid #f0f0f0; margin-top: 15px; }
+        .e-label { font-size: 0.6rem; font-weight: 900; color: #999; text-transform: uppercase; text-align: center; }
+        .e-val { font-size: 1.2rem; font-weight: 950; text-align: center; outline: none; }
+        .e-gap { grid-column: span 2; border-top: 1px solid #eee; padding-top: 8px; text-align: center; color: var(--orange); font-weight: 950; font-size: 0.8rem; }
         
-        /* 蓝色饮水模块还原 */
-        .water-box { grid-column: span 2; border-top: 1px dashed #ddd; padding-top: 5px; display: flex; justify-content: space-between; align-items: center; }
+        /* 饮水模块：蓝色风格 */
+        .water-box { grid-column: span 2; border-top: 1px dashed #ddd; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        .water-label { font-size: 0.6rem; font-weight: 950; color: var(--blue); }
+        .water-val-box { font-weight: 950; color: var(--blue); font-size: 0.9rem; }
 
-        .section-header { font-size: 0.75rem; font-weight: 950; text-transform: uppercase; color: var(--orange); margin: 15px 0 8px 0; border-left: 3px solid var(--orange); padding-left: 8px; }
+        .section-header { font-size: 0.75rem; font-weight: 950; text-transform: uppercase; color: var(--orange); margin: 20px 0 10px 0; border-left: 4px solid var(--orange); padding-left: 10px; }
         
-        /* 饮食时间轴排版还原 */
-        .diet-timeline { margin-bottom: 15px; }
-        .diet-row { display: grid; grid-template-columns: 45px 1fr; gap: 8px; margin-bottom: 4px; }
-        .t-time { font-size: 0.7rem; font-weight: 900; color: #bbb; }
-        .t-content { font-size: 0.85rem; font-weight: 600; outline: none; border-bottom: 1px solid #f2f2f2; }
+        /* 饮食安排：固定时间点 */
+        .diet-row { display: grid; grid-template-columns: 50px 1fr; gap: 10px; margin-bottom: 6px; }
+        .t-time { font-size: 0.75rem; font-weight: 900; color: #bbb; }
+        .t-content { font-size: 0.9rem; font-weight: 900; outline: none; border-bottom: 1px solid #f2f2f2; min-height: 20px; }
 
-        .training-card, .summary-card { background: #fdfdfd; border: 1px solid #f4f4f4; border-radius: 2px; padding: 12px; font-size: 0.88rem; font-weight: 600; color: #222; line-height: 1.6; white-space: pre-wrap; outline: none; min-height: 100px; }
-        .summary-card { background: #fffcf0; font-style: italic; border-left: 3px solid #666; }
+        .content-box { background: #fdfdfd; border: 1px solid #f4f4f4; border-radius: 2px; padding: 12px; font-size: 0.9rem; font-weight: 900; color: #222; line-height: 1.6; white-space: pre-wrap; outline: none; min-height: 80px; }
+        .summary-card { background: #fffcf0; font-style: italic; border-left: 4px solid #666; }
 
         /* 幽灵工具栏 */
-        .toolbar-trigger { position: fixed; bottom: 0; left: 0; right: 0; height: 80px; z-index: 999; }
-        .toolbar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px); display: flex; gap: 12px; z-index: 1000; background: var(--black); padding: 12px 25px; border-radius: 100px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); opacity: 0; }
-        .toolbar-trigger:hover + .toolbar, .toolbar:hover { transform: translateX(-50%) translateY(0); opacity: 1; }
-        button.tool-btn { background: #333; color: #fff; border: 1px solid #444; padding: 8px 18px; font-weight: 900; border-radius: 50px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; transition: 0.2s; }
+        .toolbar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 1000; background: var(--black); padding: 12px 25px; border-radius: 100px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        button.tool-btn { background: #333; color: #fff; border: 1px solid #444; padding: 10px 20px; font-weight: 950; border-radius: 50px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; }
         button.tool-btn:hover { background: var(--orange); border-color: var(--orange); }
     </style>
 </head>
@@ -75,32 +76,30 @@
 <header>
     <div class="brand"><h1>SHRED.LOG</h1><p>Evolutionary Fitness</p></div>
     <div class="meta-grid">
-        <div class="meta-box"><div class="m-label">Height / 身高 (cm)</div><div class="m-val" contenteditable="true" id="h-val">180</div></div>
-        <div class="meta-box"><div class="m-label">Base / 基准 (kg)</div><div class="m-val" contenteditable="true" id="w-val">72.0</div></div>
-        <div class="meta-box"><div class="m-label">Goal / 目标 (kg)</div><div class="m-val" contenteditable="true" style="color:var(--orange)" id="target-val">70.0</div></div>
-        <div class="meta-box"><div class="m-label">BMI 指数</div><div class="m-val" id="bmi-val">--</div></div>
+        <div class="meta-box"><div class="m-label">Height (cm)</div><div class="m-val" contenteditable="true" id="h-val">180</div></div>
+        <div class="meta-box"><div class="m-label">Initial (kg)</div><div class="m-val" contenteditable="true" id="w-val">72.0</div></div>
+        <div class="meta-box"><div class="m-label">Goal (kg)</div><div class="m-val" contenteditable="true" style="color:var(--orange)" id="target-val">70.0</div></div>
+        <div class="meta-box"><div class="m-label">BMI</div><div class="m-val" id="bmi-val">--</div></div>
         <div class="meta-box"><div class="m-label">User / 用户</div><div class="m-val" contenteditable="true" id="user-name">用户</div></div>
     </div>
 </header>
 
 <div class="global-controls">
     <div>起始日设定：<input type="date" id="start-date" onchange="renderGrid(); recalc();"></div>
-    <div id="dist-label" style="color:var(--orange)">等待数据导入...</div>
+    <div id="dist-label" style="color:var(--orange)">等待数据同步...</div>
 </div>
 
 <div class="weekly-grid" id="week-container"></div>
 
-<div class="toolbar-trigger"></div>
 <div class="toolbar">
-    <button class="tool-btn" onclick="saveLocal()">💾 保存</button>
+    <button class="tool-btn" onclick="saveData()">💾 保存</button>
     <button class="tool-btn" onclick="exportData()">📤 导出</button>
     <button class="tool-btn" onclick="importData()">📥 导入</button>
-    <button class="tool-btn" style="background:#fff; color:#000;" onclick="window.print()">📄 PDF</button>
 </div>
 
 <script>
     const WEEKDAYS = ['周一 MON', '周二 TUE', '周三 WED', '周四 THU', '周五 FRI', '周六 SAT', '周日 SUN'];
-    const DEFAULT_TIMES = ['08:00', '12:00', '16:00', '20:00'];
+    const DIET_TIMES = ['08:00', '12:00', '16:00', '20:00'];
 
     function init() {
         const d = new Date();
@@ -108,7 +107,6 @@
         const monday = new Date(d.setDate(diff)).toISOString().split('T')[0];
         
         document.getElementById('start-date').value = localStorage.getItem('shred_start') || monday;
-        
         ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => {
             const val = localStorage.getItem('shred_' + id);
             if(val) document.getElementById(id).innerText = val;
@@ -121,22 +119,20 @@
     function renderGrid() {
         const container = document.getElementById('week-container');
         container.innerHTML = '';
-        const startVal = document.getElementById('start-date').value;
-        const start = startVal ? new Date(startVal) : new Date();
+        const start = new Date(document.getElementById('start-date').value || new Date());
         const saved = JSON.parse(localStorage.getItem('shred_content') || '{}');
 
         for(let i=0; i<7; i++) {
             const cur = new Date(start); cur.setDate(start.getDate() + i);
             const d = saved[i] || {};
             
-            // 彻底兼容旧版和新版字段，确保导入不报错
             const weight = d.weight || d.w || "";
             const cin = d.in || 0, cout = d.out || 0;
             const water = d.water || "2.5";
             const mood = d.mood || 5, fatg = d.fatigue || 3;
-            const train = d.training || d.train || "";
-            const sum = d.summary || d.sum || "";
-            const dietArr = d.diet || DEFAULT_TIMES.map(t => [t, '']);
+            const training = d.training || d.train || "";
+            const summary = d.summary || d.sum || "";
+            const dietData = d.diet || DIET_TIMES.map(t => [t, '']);
 
             const card = document.createElement('div');
             card.className = 'day-card';
@@ -151,17 +147,20 @@
                     <div class="slider-group"><div class="slider-label"><span>Fatigue 疲劳度</span><span>${fatg}</span></div><input type="range" min="1" max="10" value="${fatg}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
                 </div>
                 <div class="energy-grid">
-                    <div class="e-item"><div class="e-label">入</div><div class="e-val" contenteditable="true" data-field="in">${cin}</div></div>
-                    <div class="e-item"><div class="e-label">出</div><div class="e-val" contenteditable="true" data-field="out">${cout}</div></div>
+                    <div class="e-item"><div class="e-label">摄入</div><div class="e-val" contenteditable="true" data-field="in">${cin}</div></div>
+                    <div class="e-item"><div class="e-label">消耗</div><div class="e-val" contenteditable="true" data-field="out">${cout}</div></div>
                     <div class="e-gap">缺口: <span class="gap-val">0</span> kcal</div>
-                    <div class="water-box"><div style="font-size:0.55rem;font-weight:900;color:var(--blue)">WATER / 饮水</div><div><span contenteditable="true" data-field="water" style="font-weight:900;color:var(--blue)">${water}</span> <small style="color:var(--blue)">L</small></div></div>
+                    <div class="water-box">
+                        <div class="water-label">WATER / 饮水</div>
+                        <div class="water-val-box"><span contenteditable="true" data-field="water">${water}</span> L</div>
+                    </div>
                 </div>
-                <div class="section-header">Diet / 饮食记录</div>
-                <div class="diet-timeline">${dietArr.map(m=>`<div class="diet-row"><div class="t-time" contenteditable="true">${m[0]}</div><div class="t-content" contenteditable="true" data-field="meal">${m[1]}</div></div>`).join('')}</div>
-                <div class="section-header">Training / 训练执行</div>
-                <div class="training-card" contenteditable="true" data-field="training">${train}</div>
-                <div class="section-header">Reflection / 每日总结</div>
-                <div class="summary-card" contenteditable="true" data-field="summary">${sum}</div>
+                <div class="section-header">DIET / 饮食安排</div>
+                <div class="diet-list">${dietData.map(m=>`<div class="diet-row"><div class="t-time" contenteditable="true">${m[0]}</div><div class="t-content" contenteditable="true" data-field="meal">${m[1]}</div></div>`).join('')}</div>
+                <div class="section-header">TRAINING / 训练执行</div>
+                <div class="content-box" contenteditable="true" data-field="training">${training}</div>
+                <div class="section-header">REFLECTION / 每日总结</div>
+                <div class="content-box summary-card" contenteditable="true" data-field="summary">${summary}</div>
             `;
             container.appendChild(card);
             card.addEventListener('input', () => { updateGap(card); recalc(); });
@@ -185,9 +184,11 @@
         });
 
         if(h > 0 && latestW > 0) document.getElementById('bmi-val').innerText = (latestW / (h*h)).toFixed(1);
-        const prog = hasV ? Math.min(100, Math.max(0, (Math.abs(bW - latestW) / Math.abs(bW - tW)) * 100)) : 0;
-        document.getElementById('goal-progress-bar').style.width = prog + '%';
-        document.getElementById('dist-label').innerText = hasV ? `已完成: ${Math.round(prog)}% (差 ${(latestW - tW).toFixed(1)}kg)` : "等待数据...";
+        if(!isNaN(bW) && !isNaN(tW)) {
+            const prog = hasV ? Math.min(100, Math.max(0, (Math.abs(bW - latestW) / Math.abs(bW - tW)) * 100)) : 0;
+            document.getElementById('goal-progress-bar').style.width = prog + '%';
+            document.getElementById('dist-label').innerText = hasV ? `已完成: ${Math.round(prog)}% (差 ${(latestW - tW).toFixed(1)}kg)` : "数据已同步";
+        }
     }
 
     function updateGap(card) {
@@ -196,31 +197,46 @@
         card.querySelector('.gap-val').innerText = (cin - cout).toFixed(0);
     }
 
-    function saveLocal() {
+    function saveData() {
         const cards = document.querySelectorAll('.day-card');
         const content = {};
         cards.forEach((card, i) => {
             const diet = []; card.querySelectorAll('.diet-row').forEach(row => diet.push([row.querySelector('.t-time').innerText, row.querySelector('[data-field="meal"]').innerText]));
             const s = card.querySelectorAll('input[type="range"]');
-            content[i] = { weight: card.querySelector('[data-field="weight"]').innerText, in: card.querySelector('[data-field="in"]').innerText, out: card.querySelector('[data-field="out"]').innerText, water: card.querySelector('[data-field="water"]').innerText, mood: s[0].value, fatigue: s[1].value, training: card.querySelector('[data-field="training"]').innerText, summary: card.querySelector('[data-field="summary"]').innerText, diet: diet };
+            content[i] = { 
+                weight: card.querySelector('[data-field="weight"]').innerText,
+                in: card.querySelector('[data-field="in"]').innerText,
+                out: card.querySelector('[data-field="out"]').innerText,
+                water: card.querySelector('[data-field="water"]').innerText,
+                mood: s[0].value, fatigue: s[1].value,
+                training: card.querySelector('[data-field="training"]').innerText,
+                summary: card.querySelector('[data-field="summary"]').innerText,
+                diet: diet
+            };
         });
         localStorage.setItem('shred_content', JSON.stringify(content));
         ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => localStorage.setItem('shred_' + id, document.getElementById(id).innerText));
         localStorage.setItem('shred_start', document.getElementById('start-date').value);
-        alert('本地存档成功！');
+        alert('存档已保存！');
     }
 
     function exportData() {
-        saveLocal();
-        const d = { sd: document.getElementById('start-date').value, h: document.getElementById('h-val').innerText, w: document.getElementById('w-val').innerText, t: document.getElementById('target-val').innerText, u: document.getElementById('user-name').innerText, content: JSON.parse(localStorage.getItem('shred_content')) };
-        navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(d)))).then(() => alert('全量同步码已复制！'));
+        saveData();
+        const d = { 
+            sd: document.getElementById('start-date').value, 
+            h: document.getElementById('h-val').innerText, 
+            w: document.getElementById('w-val').innerText, 
+            t: document.getElementById('target-val').innerText, 
+            u: document.getElementById('user-name').innerText, 
+            content: JSON.parse(localStorage.getItem('shred_content')) 
+        };
+        navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(d)))).then(() => alert('同步码已复制！'));
     }
 
     function importData() {
         const code = prompt('粘贴同步码:'); if(!code) return;
         try {
             const d = JSON.parse(decodeURIComponent(atob(code)));
-            // 核心兼容性映射：确保旧码数据能对应到新版布局
             localStorage.setItem('shred_content', JSON.stringify(d.content || {}));
             localStorage.setItem('shred_h-val', d.h || "180");
             localStorage.setItem('shred_w-val', d.w || "72.0");
@@ -228,7 +244,7 @@
             localStorage.setItem('shred_user-name', d.u || d.c || "用户");
             localStorage.setItem('shred_start', d.sd || d.start || "");
             location.reload();
-        } catch(e) { alert('同步码无效，请确认复制完整'); }
+        } catch(e) { alert('同步码格式不兼容，请确认复制完整'); }
     }
 
     window.onload = init;
