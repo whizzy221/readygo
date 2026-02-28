@@ -5,30 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SHRED.LOG | 进化实验室</title>
     <style>
-        :root {
-            --black: #000000; --white: #ffffff; --orange: #ff4400; 
-            --blue: #007aff; --gray-bg: #f9f9f9; --border: #eeeeee;
-        }
-
+        :root { --black: #000000; --white: #ffffff; --orange: #ff4400; --blue: #007aff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif; }
-        body { background: var(--white); color: var(--black); padding: 20px; min-height: 100vh; }
+        body { background: var(--white); color: var(--black); padding: 20px; min-height: 100vh; padding-bottom: 100px; }
         
         /* 顶部进度条 */
-        .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 6px; background: #eee; z-index: 2000; }
-        #goal-progress-bar { width: 0%; height: 100%; background: var(--orange); transition: width 0.8s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 0 10px rgba(255, 68, 0, 0.5); }
+        .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 8px; background: #eee; z-index: 2000; }
+        #goal-progress-bar { width: 0%; height: 100%; background: var(--orange); transition: width 1s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 0 15px rgba(255, 68, 0, 0.4); }
 
-        header { border-bottom: 8px solid var(--black); padding-bottom: 20px; margin-bottom: 0px; display: grid; grid-template-columns: 1.5fr 4fr; gap: 30px; }
+        header { border-bottom: 8px solid var(--black); padding-bottom: 20px; display: grid; grid-template-columns: 1.5fr 4fr; gap: 30px; }
         .brand h1 { font-size: 3.5rem; font-weight: 950; letter-spacing: -4px; line-height: 0.8; }
         .brand p { font-weight: 800; color: var(--orange); text-transform: uppercase; font-size: 0.8rem; margin-top: 8px; letter-spacing: 1.5px; }
         
         .meta-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
         .meta-box { border-left: 1px solid #ddd; padding-left: 15px; }
         .m-label { font-size: 0.6rem; font-weight: 900; color: #999; text-transform: uppercase; margin-bottom: 5px; }
-        .m-val { font-size: 1.2rem; font-weight: 900; outline: none; }
-        .m-val-goal { color: var(--orange); }
+        .m-val { font-size: 1.2rem; font-weight: 950; outline: none; }
 
         .global-controls { background: #1a1a1a; color: var(--white); padding: 15px 25px; margin: 20px 0 30px 0; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; font-weight: 700; }
-        input[type="date"] { background: #333; color: white; border: none; padding: 5px 10px; font-weight: bold; cursor: pointer; outline: none; border-radius: 4px; }
+        input[type="date"] { background: #333; color: white; border: none; padding: 5px 10px; font-weight: bold; border-radius: 4px; cursor: pointer; }
 
         .weekly-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
         @media (max-width: 1400px) { .weekly-grid { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); } }
@@ -37,33 +32,31 @@
         .day-header { border-bottom: 3px solid var(--black); padding-bottom: 8px; margin-bottom: 15px; position: relative; }
         .d-date { font-size: 0.7rem; font-weight: 900; color: var(--orange); letter-spacing: 1px; }
         .d-name { font-size: 1.5rem; font-weight: 950; letter-spacing: -1px; line-height: 1; }
-
         .day-weight-box { position: absolute; top: 0; right: 0; text-align: right; }
-        .dw-input { font-size: 1.2rem; font-weight: 900; border-bottom: 2px dashed #000; outline: none; display: inline-block; min-width: 45px; }
+        .dw-input { font-size: 1.2rem; font-weight: 950; border-bottom: 2px dashed #000; outline: none; display: inline-block; min-width: 45px; }
         .dw-diff { font-size: 0.75rem; font-weight: 900; color: var(--orange); }
 
         .status-box { margin-bottom: 12px; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
-        .slider-group { margin-bottom: 6px; }
-        .slider-label { font-size: 0.6rem; font-weight: 900; color: #666; display: flex; justify-content: space-between; }
-        input[type="range"] { width: 100%; height: 4px; accent-color: var(--orange); cursor: pointer; }
+        .slider-group { margin-bottom: 8px; }
+        .slider-label { font-size: 0.6rem; font-weight: 900; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
+        input[type="range"] { width: 100%; accent-color: var(--orange); cursor: pointer; height: 4px; }
 
         .energy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; background: #fafafa; padding: 10px; border: 1px solid #f0f0f0; }
         .e-label { font-size: 0.55rem; font-weight: 900; color: #999; text-transform: uppercase; text-align: center; }
-        .e-val { font-size: 1rem; font-weight: 900; text-align: center; outline: none; }
+        .e-val { font-size: 1.1rem; font-weight: 950; text-align: center; outline: none; }
         .e-gap { grid-column: span 2; border-top: 1px solid #eee; padding-top: 5px; text-align: center; color: var(--orange); font-weight: 900; font-size: 0.75rem; }
-        .water-box { grid-column: span 2; border-top: 1px dashed #ddd; padding-top: 5px; display: flex; justify-content: space-between; align-items: center; }
 
         .section-header { font-size: 0.75rem; font-weight: 950; text-transform: uppercase; color: var(--orange); margin: 15px 0 8px 0; border-left: 3px solid var(--orange); padding-left: 8px; }
-        .diet-timeline { margin-bottom: 15px; }
-        .diet-row { display: grid; grid-template-columns: 45px 1fr; gap: 8px; margin-bottom: 4px; }
-        .t-content { font-size: 0.85rem; font-weight: 600; outline: none; border-bottom: 1px solid #f2f2f2; }
+        .diet-timeline { font-size: 0.85rem; font-weight: 600; line-height: 1.6; outline: none; min-height: 40px; white-space: pre-wrap; }
 
-        .training-card, .summary-card { background: #fdfdfd; border: 1px solid #f4f4f4; border-radius: 2px; padding: 12px; font-size: 0.9rem; font-weight: 600; color: #222; line-height: 1.6; white-space: pre-wrap; outline: none; }
-        .training-card { min-height: 120px; border-left: 3px solid #000; }
-        .summary-card { min-height: 80px; background: #fffcf0; font-style: italic; border-left: 3px solid #666; }
+        .training-card, .summary-card { background: #fdfdfd; border: 1px solid #f4f4f4; border-radius: 2px; padding: 12px; font-size: 0.88rem; font-weight: 600; color: #222; line-height: 1.6; white-space: pre-wrap; outline: none; min-height: 100px; }
+        .summary-card { background: #fffcf0; font-style: italic; border-left: 3px solid #666; }
 
-        .toolbar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 1000; background: var(--black); padding: 12px 25px; border-radius: 100px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-        button.tool-btn { background: #333; color: #fff; border: 1px solid #444; padding: 8px 18px; font-weight: 900; border-radius: 50px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; }
+        /* 幽灵工具栏 */
+        .toolbar-trigger { position: fixed; bottom: 0; left: 0; right: 0; height: 80px; z-index: 999; }
+        .toolbar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px); display: flex; gap: 12px; z-index: 1000; background: var(--black); padding: 12px 25px; border-radius: 100px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); opacity: 0; }
+        .toolbar-trigger:hover + .toolbar, .toolbar:hover { transform: translateX(-50%) translateY(0); opacity: 1; }
+        button.tool-btn { background: #333; color: #fff; border: 1px solid #444; padding: 8px 18px; font-weight: 900; border-radius: 50px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; transition: 0.2s; }
         button.tool-btn:hover { background: var(--orange); border-color: var(--orange); }
     </style>
 </head>
@@ -74,23 +67,24 @@
 <header>
     <div class="brand"><h1>SHRED.LOG</h1><p>Evolutionary Fitness</p></div>
     <div class="meta-grid">
-        <div class="meta-box"><div class="m-label">Height / 身高 (cm)</div><div class="m-val" contenteditable="true" id="h-val">180</div></div>
-        <div class="meta-box"><div class="m-label">Base / 起始 (kg)</div><div class="m-val" contenteditable="true" id="w-val">72.0</div></div>
-        <div class="meta-box"><div class="m-label">Goal / 目标 (kg)</div><div class="m-val m-val-goal" contenteditable="true" id="target-val">70.0</div></div>
+        <div class="meta-box"><div class="m-label">Height / 身高 (cm)</div><div class="m-val" contenteditable="true" id="h-val">173</div></div>
+        <div class="meta-box"><div class="m-label">Base / 基准 (kg)</div><div class="m-val" contenteditable="true" id="w-val">77.35</div></div>
+        <div class="meta-box"><div class="m-label">Goal / 目标 (kg)</div><div class="m-val" contenteditable="true" style="color:var(--orange)" id="target-val">70.0</div></div>
         <div class="meta-box"><div class="m-label">BMI 指数</div><div class="m-val" id="bmi-val">--</div></div>
-        <div class="meta-box"><div class="m-label">User / 用户</div><div class="m-val" contenteditable="true" id="user-name">用户名</div></div>
+        <div class="meta-box"><div class="m-label">User / 用户</div><div class="m-val" contenteditable="true" id="user-name">小何</div></div>
     </div>
 </header>
 
 <div class="global-controls">
-    <span>周期起始日设定：</span><input type="date" id="start-date" onchange="renderGrid(); recalc();">
-    <span id="dist-label" style="color:var(--orange)">等待数据...</span>
+    <div>起始日：<input type="date" id="start-date" onchange="renderGrid(); recalc();"></div>
+    <div id="dist-label" style="color:var(--orange)">等待数据同步...</div>
 </div>
 
 <div class="weekly-grid" id="week-container"></div>
 
+<div class="toolbar-trigger"></div>
 <div class="toolbar">
-    <button class="tool-btn" onclick="saveData()">💾 保存</button>
+    <button class="tool-btn" onclick="saveLocal()">💾 保存</button>
     <button class="tool-btn" onclick="exportData()">📤 导出</button>
     <button class="tool-btn" onclick="importData()">📥 导入</button>
     <button class="tool-btn" style="background:#fff; color:#000;" onclick="window.print()">📄 PDF</button>
@@ -100,10 +94,12 @@
     const WEEKDAYS = ['周一 MON', '周二 TUE', '周三 WED', '周四 THU', '周五 FRI', '周六 SAT', '周日 SUN'];
 
     function init() {
+        // 自动计算本周一作为默认日期
         const d = new Date();
-        const monday = new Date(d.setDate(d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1)));
-        document.getElementById('start-date').value = localStorage.getItem('shred_start') || monday.toISOString().split('T')[0];
+        const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
+        const monday = new Date(d.setDate(diff)).toISOString().split('T')[0];
         
+        document.getElementById('start-date').value = localStorage.getItem('shred_start') || monday;
         ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => {
             const val = localStorage.getItem('shred_' + id);
             if(val) document.getElementById(id).innerText = val;
@@ -116,13 +112,23 @@
     function renderGrid() {
         const container = document.getElementById('week-container');
         container.innerHTML = '';
-        const start = new Date(document.getElementById('start-date').value);
+        const startVal = document.getElementById('start-date').value;
+        const start = startVal ? new Date(startVal) : new Date();
         const saved = JSON.parse(localStorage.getItem('shred_content') || '{}');
 
         for(let i=0; i<7; i++) {
             const cur = new Date(start); cur.setDate(start.getDate() + i);
-            // 关键修复：加入默认值逻辑，防止 undefined 出现
-            const d = saved[i] || { w:'', in:0, out:0, water:'2.5', mood:5, fatigue:3, diet:[['',''],['',''],['',''],['','']], train:'', sum:'' };
+            const d = saved[i] || {};
+            
+            // 彻底解决 undefined：通过 || "" 强制兜底
+            const weight = d.weight || d.w || "";
+            const caloriesIn = d.in || 0;
+            const caloriesOut = d.out || 0;
+            const mood = d.mood || 5;
+            const fatigue = d.fatigue || 3;
+            const training = d.training || d.train || "";
+            const summary = d.summary || d.sum || "";
+            const dietText = d.dietText || (d.diet ? d.diet.map(m => m[1]).join('\n') : "");
 
             const card = document.createElement('div');
             card.className = 'day-card';
@@ -130,24 +136,23 @@
                 <div class="day-header">
                     <div class="d-date">${cur.toLocaleDateString('zh-CN',{month:'2-digit',day:'2-digit'})}</div>
                     <div class="d-name">${WEEKDAYS[(cur.getDay()+6)%7]}</div>
-                    <div class="day-weight-box"><span class="dw-input" contenteditable="true" data-field="d-weight">${d.w || ''}</span><div class="dw-diff">--</div></div>
+                    <div class="day-weight-box"><span class="dw-input" contenteditable="true" data-field="weight">${weight}</span><div class="dw-diff">--</div></div>
                 </div>
                 <div class="status-box">
-                    <div class="slider-group"><div class="slider-label"><span>Mood 心情</span><span>${d.mood || 5}</span></div><input type="range" min="1" max="10" value="${d.mood || 5}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
-                    <div class="slider-group"><div class="slider-label"><span>Fatigue 疲劳度</span><span>${d.fatigue || 3}</span></div><input type="range" min="1" max="10" value="${d.fatigue || 3}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
+                    <div class="slider-group"><div class="slider-label"><span>Mood 心情</span><span>${mood}</span></div><input type="range" min="1" max="10" value="${mood}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
+                    <div class="slider-group"><div class="slider-label"><span>Fatigue 疲劳度</span><span>${fatigue}</span></div><input type="range" min="1" max="10" value="${fatigue}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
                 </div>
                 <div class="energy-grid">
-                    <div class="e-item"><div class="e-label">摄入</div><div class="e-val" contenteditable="true" data-field="in">${d.in || 0}</div></div>
-                    <div class="e-item"><div class="e-label">消耗</div><div class="e-val" contenteditable="true" data-field="out">${d.out || 0}</div></div>
+                    <div class="e-item"><div class="e-label">入</div><div class="e-val" contenteditable="true" data-field="in">${caloriesIn}</div></div>
+                    <div class="e-item"><div class="e-label">出</div><div class="e-val" contenteditable="true" data-field="out">${caloriesOut}</div></div>
                     <div class="e-gap">缺口: <span class="gap-val">0</span> kcal</div>
-                    <div class="water-box"><div style="font-size:0.55rem;font-weight:900;color:var(--blue)">WATER</div><div><span contenteditable="true" data-field="water" style="font-weight:900;color:var(--blue)">${d.water || '2.5'}</span> <small style="color:var(--blue)">L</small></div></div>
                 </div>
-                <div class="section-header">Diet / 饮食安排</div>
-                <div class="diet-timeline">${(d.diet || [['',''],['',''],['',''],['','']]).map(m=>`<div class="diet-row"><div class="t-content" contenteditable="true" data-field="meal">${m[1] || ''}</div></div>`).join('')}</div>
+                <div class="section-header">Diet / 饮食记录</div>
+                <div class="diet-timeline" contenteditable="true" data-field="diet">${dietText}</div>
                 <div class="section-header">Training / 训练执行</div>
-                <div class="training-card" contenteditable="true" data-field="train">${d.train || ''}</div>
+                <div class="training-card" contenteditable="true" data-field="training">${training}</div>
                 <div class="section-header">Reflection / 每日总结</div>
-                <div class="summary-card" contenteditable="true" data-field="sum">${d.sum || ''}</div>
+                <div class="summary-card" contenteditable="true" data-field="summary">${summary}</div>
             `;
             container.appendChild(card);
             card.addEventListener('input', () => { updateGap(card); recalc(); });
@@ -159,23 +164,21 @@
         const h = parseFloat(document.getElementById('h-val').innerText) / 100;
         const bW = parseFloat(document.getElementById('w-val').innerText);
         const tW = parseFloat(document.getElementById('target-val').innerText);
-        let lW = bW, hasV = false;
+        let latestW = bW, hasV = false;
 
-        document.querySelectorAll('[data-field="d-weight"]').forEach(el => {
+        document.querySelectorAll('[data-field="weight"]').forEach(el => {
             const v = el.innerText.trim();
             if(v !== "" && !isNaN(parseFloat(v))) {
-                lW = parseFloat(v); hasV = true;
-                const diff = (lW - bW).toFixed(1);
+                latestW = parseFloat(v); hasV = true;
+                const diff = (latestW - bW).toFixed(1);
                 el.nextElementSibling.innerText = (diff > 0 ? '+' : '') + diff + 'kg';
-            } else { el.nextElementSibling.innerText = "--"; }
+            } else { el.nextElementSibling.innerText = "--"; } // 解决删除残留 Bug
         });
 
-        if(h > 0 && lW > 0) document.getElementById('bmi-val').innerText = (lW / (h*h)).toFixed(1);
-        if(!isNaN(bW) && !isNaN(tW) && bW !== tW) {
-            const prog = hasV ? Math.min(100, Math.max(0, (Math.abs(bW - lW) / Math.abs(bW - tW)) * 100)) : 0;
-            document.getElementById('goal-progress-bar').style.width = prog + '%';
-            document.getElementById('dist-label').innerText = hasV ? `完成度: ${Math.round(prog)}% (差 ${(lW - tW).toFixed(1)}kg)` : "等待数据...";
-        }
+        if(h > 0 && latestW > 0) document.getElementById('bmi-val').innerText = (latestW / (h*h)).toFixed(1);
+        const prog = hasV ? Math.min(100, Math.max(0, (Math.abs(bW - latestW) / Math.abs(bW - tW)) * 100)) : 0;
+        document.getElementById('goal-progress-bar').style.width = prog + '%';
+        document.getElementById('dist-label').innerText = hasV ? `已完成: ${Math.round(prog)}% (差 ${(latestW - tW).toFixed(1)}kg)` : "数据已同步：小何";
     }
 
     function updateGap(card) {
@@ -184,51 +187,56 @@
         card.querySelector('.gap-val').innerText = (cin - cout).toFixed(0);
     }
 
-    function saveData() {
+    function saveLocal() {
         const cards = document.querySelectorAll('.day-card');
         const content = {};
         cards.forEach((card, i) => {
-            const diet = []; card.querySelectorAll('.diet-row').forEach(row => diet.push(['', row.querySelector('[data-field="meal"]').innerText]));
             const s = card.querySelectorAll('input[type="range"]');
-            content[i] = { w:card.querySelector('[data-field="d-weight"]').innerText, in:card.querySelector('[data-field="in"]').innerText, out:card.querySelector('[data-field="out"]').innerText, water:card.querySelector('[data-field="water"]').innerText, mood:s[0].value, fatigue:s[1].value, diet:diet, train:card.querySelector('[data-field="train"]').innerText, sum:card.querySelector('[data-field="sum"]').innerText };
+            content[i] = { 
+                weight: card.querySelector('[data-field="weight"]').innerText,
+                in: card.querySelector('[data-field="in"]').innerText,
+                out: card.querySelector('[data-field="out"]').innerText,
+                mood: s[0].value, fatigue: s[1].value,
+                training: card.querySelector('[data-field="training"]').innerText,
+                summary: card.querySelector('[data-field="summary"]').innerText,
+                dietText: card.querySelector('[data-field="diet"]').innerText
+            };
         });
         localStorage.setItem('shred_content', JSON.stringify(content));
         ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => localStorage.setItem('shred_' + id, document.getElementById(id).innerText));
         localStorage.setItem('shred_start', document.getElementById('start-date').value);
-        alert('数据已保存');
+        alert('本地存档成功！');
     }
 
     function exportData() {
-        saveData();
-        const d = { start: document.getElementById('start-date').value, h: document.getElementById('h-val').innerText, w: document.getElementById('w-val').innerText, t: document.getElementById('target-val').innerText, u: document.getElementById('user-name').innerText, content: JSON.parse(localStorage.getItem('shred_content')) };
-        navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(d)))).then(() => alert('导出成功！'));
+        saveLocal();
+        const d = { 
+            sd: document.getElementById('start-date').value, 
+            h: document.getElementById('h-val').innerText, 
+            w: document.getElementById('w-val').innerText, 
+            t: document.getElementById('target-val').innerText, 
+            u: "小何", 
+            content: JSON.parse(localStorage.getItem('shred_content')) 
+        };
+        navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(d)))).then(() => alert('全量同步码已复制！'));
     }
 
     function importData() {
-        const code = prompt('输入同步码:'); if(!code) return;
+        const code = prompt('粘贴同步码:'); if(!code) return;
         try {
             const d = JSON.parse(decodeURIComponent(atob(code)));
-            // 兼容性逻辑：如果是旧版数据，自动映射到新版字段
-            const finalStart = d.start || d.sd || new Date().toISOString().split('T')[0];
-            const finalH = d.h || "180";
-            const finalW = d.w || "72.0";
-            const finalT = d.t || d.tw || "70.0";
-            const finalU = d.u || d.c || "用户";
-            const finalContent = d.content || {};
-
-            document.getElementById('start-date').value = finalStart;
-            document.getElementById('h-val').innerText = finalH;
-            document.getElementById('w-val').innerText = finalW;
-            document.getElementById('target-val').innerText = finalT;
-            document.getElementById('user-name').innerText = finalU;
-
-            localStorage.setItem('shred_content', JSON.stringify(finalContent));
-            renderGrid(); recalc(); alert('导入成功，undefined 已修复');
-        } catch(e) { alert('同步码格式不匹配，请确认代码完整'); }
+            // 核心兼容性逻辑：管你是旧版还是新版，全速匹配
+            localStorage.setItem('shred_content', JSON.stringify(d.content || {}));
+            localStorage.setItem('shred_h-val', d.h || "173");
+            localStorage.setItem('shred_w-val', d.w || "77.35");
+            localStorage.setItem('shred_target-val', d.t || d.tw || "70.0");
+            localStorage.setItem('shred_user-name', "小何");
+            localStorage.setItem('shred_start', d.sd || d.start || "2026-02-26");
+            location.reload();
+        } catch(e) { alert('同步码无效'); }
     }
 
     window.onload = init;
 </script>
-
 </body>
 </html>
