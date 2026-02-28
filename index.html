@@ -6,14 +6,22 @@
     <title>SHRED.LOG | 进化实验室</title>
     <style>
         :root { --black: #000000; --white: #ffffff; --orange: #ff4400; --blue: #007aff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'SF Pro Display', -apple-system, sans-serif; }
-        body { background: var(--white); color: var(--black); padding: 20px; min-height: 100vh; padding-bottom: 100px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'SF Pro Display', sans-serif; }
+        /* 增加底部留白，确保幽灵菜单不挡住内容 */
+        body { background: var(--white); color: var(--black); padding: 20px; min-height: 100vh; padding-bottom: 120px; }
         
-        /* 顶部进度条 */
         .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 8px; background: #eee; z-index: 2000; }
-        #goal-progress-bar { width: 0%; height: 100%; background: var(--orange); transition: width 1s ease; box-shadow: 0 0 15px rgba(255, 68, 0, 0.4); }
+        #goal-progress-bar { width: 0%; height: 100%; background: var(--orange); transition: width 1s ease; }
 
-        /* 顶部元数据：极致粗体 */
+        /* 档案夹样式复原：更克制、更贴合 */
+        .profile-bar { display: flex; gap: 4px; margin-bottom: 15px; }
+        .profile-tab { position: relative; padding: 6px 25px 6px 15px; background: #eee; color: #666; font-size: 0.75rem; font-weight: 950; cursor: pointer; border-radius: 4px 4px 0 0; text-transform: uppercase; transition: 0.2s; }
+        .profile-tab.active { background: var(--black); color: var(--white); }
+        .del-p-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); color: #999; font-size: 14px; padding: 0 4px; }
+        .del-p-btn:hover { color: var(--orange); }
+        .add-profile-btn { padding: 6px 15px; background: #eee; color: var(--black); font-weight: 950; cursor: pointer; border-radius: 4px 4px 0 0; font-size: 0.75rem; }
+        .add-profile-btn:hover { background: #ddd; }
+
         header { border-bottom: 8px solid var(--black); padding-bottom: 20px; display: grid; grid-template-columns: 1.5fr 4fr; gap: 30px; }
         .brand h1 { font-size: 3.5rem; font-weight: 950; letter-spacing: -4px; line-height: 0.8; text-transform: uppercase; }
         .brand p { font-weight: 800; color: var(--orange); text-transform: uppercase; font-size: 0.8rem; margin-top: 8px; letter-spacing: 1.5px; }
@@ -21,146 +29,276 @@
         .meta-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
         .meta-box { border-left: 1px solid #ddd; padding-left: 15px; }
         .m-label { font-size: 0.6rem; font-weight: 900; color: #999; text-transform: uppercase; margin-bottom: 5px; }
-        .m-val { font-size: 1.2rem; font-weight: 950; outline: none; }
+        .m-val { font-size: 1.25rem; font-weight: 950; outline: none; }
 
-        .global-controls { background: #1a1a1a; color: var(--white); padding: 15px 25px; margin: 20px 0 30px 0; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; font-weight: 700; }
-        input[type="date"] { background: #333; color: white; border: none; padding: 5px 10px; font-weight: bold; border-radius: 4px; outline: none; }
+        /* 周期控制条复原：紧凑圆角设计 */
+        .global-controls { background: #1a1a1a; color: var(--white); padding: 12px 20px; border-radius: 4px; margin: 20px 0 30px 0; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; font-weight: 700; }
+        .control-group { display: flex; align-items: center; gap: 12px; }
+        select, input[type="date"] { background: #333; color: white; border: none; padding: 5px 10px; font-weight: 950; border-radius: 4px; outline: none; cursor: pointer; }
 
         .weekly-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
         @media (max-width: 1400px) { .weekly-grid { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); } }
 
-        /* 卡片设计 */
-        .day-card { border: 1px solid #eee; padding: 18px; border-radius: 4px; background: #fff; transition: 0.3s; }
+        /* 卡片极粗体保留 */
+        .day-card { border: 1px solid #eee; padding: 18px; border-radius: 4px; background: #fff; transition: 0.3s; position: relative; }
         .day-header { border-bottom: 3px solid var(--black); padding-bottom: 8px; margin-bottom: 15px; position: relative; }
-        .d-date { font-size: 0.7rem; font-weight: 950; color: var(--orange); letter-spacing: 1px; }
-        .d-name { font-size: 1.6rem; font-weight: 950; letter-spacing: -1px; line-height: 1; }
+        .d-date { font-size: 0.75rem; font-weight: 950; color: var(--orange); letter-spacing: 1px; }
+        .d-name { font-size: 1.6rem; font-weight: 950; letter-spacing: -1px; line-height: 1; text-transform: uppercase; }
         .day-weight-box { position: absolute; top: 0; right: 0; text-align: right; }
-        .dw-input { font-size: 1.3rem; font-weight: 950; border-bottom: 2px dashed #000; outline: none; display: inline-block; min-width: 45px; }
-        .dw-diff { font-size: 0.75rem; font-weight: 900; color: var(--orange); }
+        .dw-input { font-size: 1.4rem; font-weight: 950; border-bottom: 2px dashed #000; outline: none; display: inline-block; min-width: 45px; }
+        .dw-diff { font-size: 0.75rem; font-weight: 950; color: var(--orange); }
 
+        /* 情绪滑块独立分离 */
+        .status-box { margin-bottom: 12px; border-bottom: 1px dashed #eee; padding-bottom: 8px; }
         .slider-group { margin-bottom: 8px; }
-        .slider-label { font-size: 0.65rem; font-weight: 900; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
-        input[type="range"] { width: 100%; accent-color: var(--orange); cursor: pointer; height: 4px; }
+        .slider-label { font-size: 0.65rem; font-weight: 950; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
+        input[type="range"] { width: 100%; accent-color: var(--orange); cursor: pointer; height: 6px; }
 
-        /* 能量缺口区：还原“摄入”与“消耗” */
+        /* 摄入/消耗(TDEE)/饮水模块 */
         .energy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; background: #fafafa; padding: 10px; border: 1px solid #f0f0f0; margin-top: 15px; }
-        .e-label { font-size: 0.6rem; font-weight: 900; color: #999; text-transform: uppercase; text-align: center; }
-        .e-val { font-size: 1.2rem; font-weight: 950; text-align: center; outline: none; }
-        .e-gap { grid-column: span 2; border-top: 1px solid #eee; padding-top: 8px; text-align: center; color: var(--orange); font-weight: 950; font-size: 0.8rem; }
+        .e-label { font-size: 0.65rem; font-weight: 950; color: #999; text-transform: uppercase; text-align: center; }
+        .e-val { font-size: 1.25rem; font-weight: 950; text-align: center; outline: none; }
+        .e-gap { grid-column: span 2; border-top: 1px solid #eee; padding-top: 10px; text-align: center; color: var(--orange); font-weight: 950; font-size: 0.85rem; }
+        .water-box { grid-column: span 2; border-top: 1px dashed #ddd; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        .water-label { font-size: 0.65rem; font-weight: 950; color: var(--blue); }
+        .water-val-box { font-weight: 950; color: var(--blue); font-size: 1rem; }
+
+        .section-header { font-size: 0.8rem; font-weight: 950; text-transform: uppercase; color: var(--orange); margin: 25px 0 12px 0; border-left: 5px solid var(--orange); padding-left: 12px; }
+        .diet-row { display: grid; grid-template-columns: 55px 1fr; gap: 10px; margin-bottom: 8px; }
+        .t-time { font-size: 0.8rem; font-weight: 950; color: #bbb; }
+        .t-content { font-size: 0.95rem; font-weight: 950; outline: none; border-bottom: 1px solid #eee; min-height: 22px; }
+        .content-box { background: #fdfdfd; border: 1px solid #f4f4f4; padding: 15px; font-size: 0.95rem; font-weight: 950; line-height: 1.6; white-space: pre-wrap; outline: none; min-height: 100px; }
+        .summary-card { background: #fffcf0; font-style: italic; border-left: 5px solid #666; }
+
+        /* 🔥单层横向幽灵工具栏🔥 */
+        .toolbar-wrapper {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            background: var(--black);
+            padding: 10px 20px;
+            border-radius: 100px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            align-items: center;
+            gap: 15px;
+            /* 幽灵动画 */
+            transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.3s ease;
+            transform: translateX(-50%) translateY(100px);
+            opacity: 0;
+            pointer-events: none;
+        }
         
-        /* 饮水模块：蓝色风格 */
-        .water-box { grid-column: span 2; border-top: 1px dashed #ddd; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
-        .water-label { font-size: 0.6rem; font-weight: 950; color: var(--blue); }
-        .water-val-box { font-weight: 950; color: var(--blue); font-size: 0.9rem; }
+        /* 鼠标悬浮激活态 */
+        .toolbar-wrapper.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-        .section-header { font-size: 0.75rem; font-weight: 950; text-transform: uppercase; color: var(--orange); margin: 20px 0 10px 0; border-left: 4px solid var(--orange); padding-left: 10px; }
-        
-        /* 饮食安排：固定时间点 */
-        .diet-row { display: grid; grid-template-columns: 50px 1fr; gap: 10px; margin-bottom: 6px; }
-        .t-time { font-size: 0.75rem; font-weight: 900; color: #bbb; }
-        .t-content { font-size: 0.9rem; font-weight: 900; outline: none; border-bottom: 1px solid #f2f2f2; min-height: 20px; }
+        .toolbar-section { display: flex; align-items: center; gap: 8px; }
+        .toolbar-divider { width: 1px; height: 20px; background: #444; margin: 0 5px; }
+        .toolbar-title { font-size: 10px; color: #888; font-weight: 950; text-transform: uppercase; white-space: nowrap; }
 
-        .content-box { background: #fdfdfd; border: 1px solid #f4f4f4; border-radius: 2px; padding: 12px; font-size: 0.9rem; font-weight: 900; color: #222; line-height: 1.6; white-space: pre-wrap; outline: none; min-height: 80px; }
-        .summary-card { background: #fffcf0; font-style: italic; border-left: 4px solid #666; }
+        button.tool-btn { background: #333; color: #fff; border: 1px solid #444; padding: 8px 16px; font-weight: 950; border-radius: 50px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; white-space: nowrap; }
+        button.tool-btn:hover { background: #444; border-color: #666; }
+        button.primary-btn { background: var(--orange); border-color: var(--orange); color: #fff; }
+        button.primary-btn:hover { background: #e03c00; border-color: #e03c00; }
 
-        /* 幽灵工具栏 */
-        .toolbar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 1000; background: var(--black); padding: 12px 25px; border-radius: 100px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-        button.tool-btn { background: #333; color: #fff; border: 1px solid #444; padding: 10px 20px; font-weight: 950; border-radius: 50px; cursor: pointer; font-size: 0.7rem; text-transform: uppercase; }
-        button.tool-btn:hover { background: var(--orange); border-color: var(--orange); }
+        /* 底部隐形触发区 */
+        .hover-trigger-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            z-index: 999;
+        }
+        /* 底部微小提示条 */
+        .hover-hint {
+            position: fixed;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: 950;
+            color: #999;
+            z-index: 998;
+            pointer-events: none;
+            letter-spacing: 1px;
+            opacity: 0.5;
+        }
+
     </style>
 </head>
 <body>
 
 <div class="progress-container"><div id="goal-progress-bar"></div></div>
 
+<div class="profile-bar" id="profile-tabs">
+    <div class="add-profile-btn" onclick="addNewP()">+ 新建 / ADD</div>
+</div>
+
 <header>
     <div class="brand"><h1>SHRED.LOG</h1><p>Evolutionary Fitness</p></div>
     <div class="meta-grid">
-        <div class="meta-box"><div class="m-label">Height (cm)</div><div class="m-val" contenteditable="true" id="h-val">180</div></div>
-        <div class="meta-box"><div class="m-label">Initial (kg)</div><div class="m-val" contenteditable="true" id="w-val">72.0</div></div>
-        <div class="meta-box"><div class="m-label">Goal (kg)</div><div class="m-val" contenteditable="true" style="color:var(--orange)" id="target-val">70.0</div></div>
+        <div class="meta-box"><div class="m-label">Height / 身高</div><div class="m-val" contenteditable="true" id="h-val">180</div></div>
+        <div class="meta-box"><div class="m-label">Base / 基准</div><div class="m-val" contenteditable="true" id="w-val">72.0</div></div>
+        <div class="meta-box"><div class="m-label">Goal / 目标</div><div class="m-val" contenteditable="true" style="color:var(--orange)" id="target-val">70.0</div></div>
         <div class="meta-box"><div class="m-label">BMI</div><div class="m-val" id="bmi-val">--</div></div>
         <div class="meta-box"><div class="m-label">User / 用户</div><div class="m-val" contenteditable="true" id="user-name">用户</div></div>
     </div>
 </header>
 
 <div class="global-controls">
-    <div>起始日设定：<input type="date" id="start-date" onchange="renderGrid(); recalc();"></div>
-    <div id="dist-label" style="color:var(--orange)">等待数据同步...</div>
+    <div class="control-group"><span>历史周期：</span><select id="cycle-select" onchange="switchCycle()"></select></div>
+    <div class="control-group"><span>起始日设定：</span><input type="date" id="start-date" onchange="createNewCycle()"></div>
+    <span id="dist-label" style="color:var(--orange)">等待数据...</span>
 </div>
 
 <div class="weekly-grid" id="week-container"></div>
 
-<div class="toolbar">
-    <button class="tool-btn" onclick="saveData()">💾 保存</button>
-    <button class="tool-btn" onclick="exportData()">📤 导出</button>
-    <button class="tool-btn" onclick="importData()">📥 导入</button>
+<div class="hover-trigger-area" id="trigger-area"></div>
+<div class="hover-hint">▼ 鼠标移至底部唤出操作栏 ▼</div>
+
+<div class="toolbar-wrapper" id="ghost-toolbar">
+    
+    <div class="toolbar-section">
+        <span class="toolbar-title">当前档案:</span>
+        <button class="tool-btn" onclick="expSingle()">📤 导出</button>
+        <button class="tool-btn" onclick="impSingle()">📥 导入</button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="toolbar-section">
+        <span class="toolbar-title">系统级全量:</span>
+        <button class="tool-btn" onclick="expFull()">📦 备份</button>
+        <button class="tool-btn" onclick="impFull()">🔄 恢复</button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="toolbar-section">
+        <button class="tool-btn primary-btn" onclick="save()">💾 保存本周</button>
+        <button class="tool-btn primary-btn" onclick="goNext()">开启下周 →</button>
+    </div>
+
 </div>
 
 <script>
-    const WEEKDAYS = ['周一 MON', '周二 TUE', '周三 WED', '周四 THU', '周五 FRI', '周六 SAT', '周日 SUN'];
-    const DIET_TIMES = ['08:00', '12:00', '16:00', '20:00'];
+    let activePID = localStorage.getItem('shred_v10_pid') || 'p1';
+    let activeDate = "";
+    const DIET_T = ['08:00', '12:00', '16:00', '20:00'];
 
-    function init() {
-        const d = new Date();
-        const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
-        const monday = new Date(d.setDate(diff)).toISOString().split('T')[0];
-        
-        document.getElementById('start-date').value = localStorage.getItem('shred_start') || monday;
-        ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => {
-            const val = localStorage.getItem('shred_' + id);
-            if(val) document.getElementById(id).innerText = val;
-        });
+    function init() { refreshTabs(); loadProfile(); setupGhostToolbar(); }
 
-        renderGrid();
-        recalc();
+    // 幽灵菜单触发逻辑
+    function setupGhostToolbar() {
+        const trigger = document.getElementById('trigger-area');
+        const toolbar = document.getElementById('ghost-toolbar');
+        let hideTimer;
+
+        const showBar = () => { clearTimeout(hideTimer); toolbar.classList.add('show'); };
+        const hideBar = () => { hideTimer = setTimeout(() => { toolbar.classList.remove('show'); }, 300); };
+
+        trigger.addEventListener('mouseenter', showBar);
+        trigger.addEventListener('mouseleave', hideBar);
+        toolbar.addEventListener('mouseenter', showBar);
+        toolbar.addEventListener('mouseleave', hideBar);
     }
 
+    function refreshTabs() {
+        const tabs = document.getElementById('profile-tabs');
+        const profiles = JSON.parse(localStorage.getItem('shred_v10_profiles') || '["p1"]');
+        Array.from(tabs.querySelectorAll('.profile-tab')).forEach(t => t.remove());
+        profiles.forEach(pid => {
+            const tab = document.createElement('div');
+            tab.className = `profile-tab ${pid === activePID ? 'active' : ''}`;
+            const name = localStorage.getItem(`shred_v10_${pid}_user-name`) || '新档案';
+            tab.innerHTML = `${name} <span class="del-p-btn" onclick="delP(event, '${pid}')">×</span>`;
+            tab.onclick = () => { activePID = pid; localStorage.setItem('shred_v10_pid', pid); location.reload(); };
+            tabs.insertBefore(tab, tabs.querySelector('.add-profile-btn'));
+        });
+    }
+
+    function addNewP() {
+        const profiles = JSON.parse(localStorage.getItem('shred_v10_profiles') || '["p1"]');
+        const pid = 'p' + Date.now(); profiles.push(pid);
+        localStorage.setItem('shred_v10_profiles', JSON.stringify(profiles));
+        activePID = pid; localStorage.setItem('shred_v10_pid', pid); location.reload();
+    }
+
+    function delP(e, pid) {
+        e.stopPropagation(); if(!confirm('永久删除该档案及其数据？')) return;
+        let p = JSON.parse(localStorage.getItem('shred_v10_profiles') || '["p1"]');
+        p = p.filter(id => id !== pid); if(p.length === 0) p = ["p1"];
+        localStorage.setItem('shred_v10_profiles', JSON.stringify(p));
+        Object.keys(localStorage).forEach(k => { if(k.startsWith(`shred_v10_${pid}_`)) localStorage.removeItem(k); });
+        if(activePID === pid) activePID = p[0];
+        localStorage.setItem('shred_v10_pid', activePID); location.reload();
+    }
+
+    function loadProfile() {
+        const pre = `shred_v10_${activePID}_`;
+        ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => {
+            const v = localStorage.getItem(pre + id); if(v) document.getElementById(id).innerText = v;
+        });
+        const list = JSON.parse(localStorage.getItem(pre + 'list') || '[]');
+        const sel = document.getElementById('cycle-select');
+        sel.innerHTML = list.length ? '' : '<option value="">暂无记录</option>';
+        list.sort().reverse().forEach(d => {
+            const opt = document.createElement('option'); opt.value = d; opt.innerText = `周期: ${d}`;
+            if(d === activeDate) opt.selected = true;
+            sel.appendChild(opt);
+        });
+        const d = new Date();
+        const mon = new Date(d.setDate(d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1))).toISOString().split('T')[0];
+        activeDate = sel.value || mon;
+        document.getElementById('start-date').value = activeDate;
+        renderGrid(); recalc();
+    }
+
+    function switchCycle() { activeDate = document.getElementById('cycle-select').value; renderGrid(); recalc(); }
+    function createNewCycle() { activeDate = document.getElementById('start-date').value; renderGrid(); recalc(); }
+
     function renderGrid() {
-        const container = document.getElementById('week-container');
-        container.innerHTML = '';
-        const start = new Date(document.getElementById('start-date').value || new Date());
-        const saved = JSON.parse(localStorage.getItem('shred_content') || '{}');
+        const container = document.getElementById('week-container'); container.innerHTML = '';
+        const start = new Date(activeDate);
+        const history = JSON.parse(localStorage.getItem(`shred_v10_${activePID}_history`) || '{}');
+        const cycle = history[activeDate] || {};
 
         for(let i=0; i<7; i++) {
             const cur = new Date(start); cur.setDate(start.getDate() + i);
-            const d = saved[i] || {};
-            
-            const weight = d.weight || d.w || "";
-            const cin = d.in || 0, cout = d.out || 0;
-            const water = d.water || "2.5";
-            const mood = d.mood || 5, fatg = d.fatigue || 3;
-            const training = d.training || d.train || "";
-            const summary = d.summary || d.sum || "";
-            const dietData = d.diet || DIET_TIMES.map(t => [t, '']);
+            const d = cycle[i] || {};
+            const diet = d.diet || DIET_T.map(t => [t, '']);
 
             const card = document.createElement('div');
             card.className = 'day-card';
             card.innerHTML = `
                 <div class="day-header">
                     <div class="d-date">${cur.toLocaleDateString('zh-CN',{month:'2-digit',day:'2-digit'})}</div>
-                    <div class="d-name">${WEEKDAYS[(cur.getDay()+6)%7]}</div>
-                    <div class="day-weight-box"><span class="dw-input" contenteditable="true" data-field="weight">${weight}</span><div class="dw-diff">--</div></div>
+                    <div class="d-name">${['周一 MON','周二 TUE','周三 WED','周四 THU','周五 FRI','周六 SAT','周日 SUN'][(cur.getDay()+6)%7]}</div>
+                    <div class="day-weight-box"><span class="dw-input" contenteditable="true" data-field="weight">${d.weight || ''}</span><div class="dw-diff">--</div></div>
                 </div>
                 <div class="status-box">
-                    <div class="slider-group"><div class="slider-label"><span>Mood 心情</span><span>${mood}</span></div><input type="range" min="1" max="10" value="${mood}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
-                    <div class="slider-group"><div class="slider-label"><span>Fatigue 疲劳度</span><span>${fatg}</span></div><input type="range" min="1" max="10" value="${fatg}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
+                    <div class="slider-group"><div class="slider-label"><span>Mood 心情</span><span class="v-num">${d.mood || 5}</span></div><input type="range" min="1" max="10" value="${d.mood || 5}" oninput="this.previousElementSibling.querySelector('.v-num').innerText=this.value"></div>
+                    <div class="slider-group"><div class="slider-label"><span>Fatigue 疲劳度</span><span class="v-num">${d.fatigue || 3}</span></div><input type="range" min="1" max="10" value="${d.fatigue || 3}" oninput="this.previousElementSibling.querySelector('.v-num').innerText=this.value"></div>
                 </div>
                 <div class="energy-grid">
-                    <div class="e-item"><div class="e-label">摄入</div><div class="e-val" contenteditable="true" data-field="in">${cin}</div></div>
-                    <div class="e-item"><div class="e-label">消耗</div><div class="e-val" contenteditable="true" data-field="out">${cout}</div></div>
+                    <div class="e-item"><div class="e-label">摄入</div><div class="e-val" contenteditable="true" data-field="in">${d.in || 0}</div></div>
+                    <div class="e-item"><div class="e-label">消耗 (TDEE)</div><div class="e-val" contenteditable="true" data-field="out">${d.out || 0}</div></div>
                     <div class="e-gap">缺口: <span class="gap-val">0</span> kcal</div>
-                    <div class="water-box">
-                        <div class="water-label">WATER / 饮水</div>
-                        <div class="water-val-box"><span contenteditable="true" data-field="water">${water}</span> L</div>
-                    </div>
+                    <div class="water-box"><div class="water-label">WATER / 饮水</div><div class="water-val-box"><span contenteditable="true" data-field="water">${d.water || '2.5'}</span> L</div></div>
                 </div>
                 <div class="section-header">DIET / 饮食安排</div>
-                <div class="diet-list">${dietData.map(m=>`<div class="diet-row"><div class="t-time" contenteditable="true">${m[0]}</div><div class="t-content" contenteditable="true" data-field="meal">${m[1]}</div></div>`).join('')}</div>
+                <div class="diet-list">${diet.map(m=>`<div class="diet-row"><div class="t-time" contenteditable="true">${m[0]}</div><div class="t-content" contenteditable="true" data-field="meal">${m[1]}</div></div>`).join('')}</div>
                 <div class="section-header">TRAINING / 训练执行</div>
-                <div class="content-box" contenteditable="true" data-field="training">${training}</div>
+                <div class="content-box" contenteditable="true" data-field="training">${d.training || ''}</div>
                 <div class="section-header">REFLECTION / 每日总结</div>
-                <div class="content-box summary-card" contenteditable="true" data-field="summary">${summary}</div>
+                <div class="content-box summary-card" contenteditable="true" data-field="summary">${d.summary || ''}</div>
             `;
             container.appendChild(card);
             card.addEventListener('input', () => { updateGap(card); recalc(); });
@@ -169,82 +307,84 @@
     }
 
     function recalc() {
-        const h = parseFloat(document.getElementById('h-val').innerText) / 100;
-        const bW = parseFloat(document.getElementById('w-val').innerText);
-        const tW = parseFloat(document.getElementById('target-val').innerText);
-        let latestW = bW, hasV = false;
-
+        const h = parseFloat(document.getElementById('h-val').innerText)/100, bW = parseFloat(document.getElementById('w-val').innerText), tW = parseFloat(document.getElementById('target-val').innerText);
+        let lW = bW, hasV = false;
         document.querySelectorAll('[data-field="weight"]').forEach(el => {
             const v = el.innerText.trim();
-            if(v !== "" && !isNaN(parseFloat(v))) {
-                latestW = parseFloat(v); hasV = true;
-                const diff = (latestW - bW).toFixed(1);
-                el.nextElementSibling.innerText = (diff > 0 ? '+' : '') + diff + 'kg';
-            } else { el.nextElementSibling.innerText = "--"; }
+            if(v && !isNaN(v)) { lW = parseFloat(v); hasV = true; el.nextElementSibling.innerText = (lW-bW > 0 ? '+' : '') + (lW-bW).toFixed(1) + 'kg'; }
+            else { el.nextElementSibling.innerText = "--"; }
         });
-
-        if(h > 0 && latestW > 0) document.getElementById('bmi-val').innerText = (latestW / (h*h)).toFixed(1);
-        if(!isNaN(bW) && !isNaN(tW)) {
-            const prog = hasV ? Math.min(100, Math.max(0, (Math.abs(bW - latestW) / Math.abs(bW - tW)) * 100)) : 0;
-            document.getElementById('goal-progress-bar').style.width = prog + '%';
-            document.getElementById('dist-label').innerText = hasV ? `已完成: ${Math.round(prog)}% (差 ${(latestW - tW).toFixed(1)}kg)` : "数据已同步";
-        }
+        if(h>0 && lW>0) document.getElementById('bmi-val').innerText = (lW/(h*h)).toFixed(1);
+        const p = hasV ? Math.min(100, Math.max(0, (Math.abs(bW-lW)/Math.abs(bW-tW))*100)) : 0;
+        document.getElementById('goal-progress-bar').style.width = p + '%';
+        document.getElementById('dist-label').innerText = hasV ? `进度: ${Math.round(p)}% (差 ${(lW-tW).toFixed(1)}kg)` : "数据正常";
     }
 
     function updateGap(card) {
-        const cin = parseFloat(card.querySelector('[data-field="in"]').innerText) || 0;
-        const cout = parseFloat(card.querySelector('[data-field="out"]').innerText) || 0;
-        card.querySelector('.gap-val').innerText = (cin - cout).toFixed(0);
+        const i = parseFloat(card.querySelector('[data-field="in"]').innerText) || 0, o = parseFloat(card.querySelector('[data-field="out"]').innerText) || 0;
+        card.querySelector('.gap-val').innerText = (i - o).toFixed(0);
     }
 
-    function saveData() {
-        const cards = document.querySelectorAll('.day-card');
-        const content = {};
+    function save() {
+        const pre = `shred_v10_${activePID}_`;
+        const history = JSON.parse(localStorage.getItem(pre + 'history') || '{}');
+        const cards = document.querySelectorAll('.day-card'); const cycle = {};
         cards.forEach((card, i) => {
             const diet = []; card.querySelectorAll('.diet-row').forEach(row => diet.push([row.querySelector('.t-time').innerText, row.querySelector('[data-field="meal"]').innerText]));
             const s = card.querySelectorAll('input[type="range"]');
-            content[i] = { 
-                weight: card.querySelector('[data-field="weight"]').innerText,
-                in: card.querySelector('[data-field="in"]').innerText,
-                out: card.querySelector('[data-field="out"]').innerText,
-                water: card.querySelector('[data-field="water"]').innerText,
-                mood: s[0].value, fatigue: s[1].value,
-                training: card.querySelector('[data-field="training"]').innerText,
-                summary: card.querySelector('[data-field="summary"]').innerText,
-                diet: diet
-            };
+            cycle[i] = { weight: card.querySelector('[data-field="weight"]').innerText, in: card.querySelector('[data-field="in"]').innerText, out: card.querySelector('[data-field="out"]').innerText, water: card.querySelector('[data-field="water"]').innerText, mood: s[0].value, fatigue: s[1].value, training: card.querySelector('[data-field="training"]').innerText, summary: card.querySelector('[data-field="summary"]').innerText, diet: diet };
         });
-        localStorage.setItem('shred_content', JSON.stringify(content));
-        ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => localStorage.setItem('shred_' + id, document.getElementById(id).innerText));
-        localStorage.setItem('shred_start', document.getElementById('start-date').value);
-        alert('存档已保存！');
+        history[activeDate] = cycle; localStorage.setItem(pre + 'history', JSON.stringify(history));
+        const list = JSON.parse(localStorage.getItem(pre + 'list') || '[]');
+        if (!list.includes(activeDate)) list.push(activeDate);
+        localStorage.setItem(pre + 'list', JSON.stringify(list));
+        ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => localStorage.setItem(pre + id, document.getElementById(id).innerText));
+        alert('存档已保存！档案名已同步。'); location.reload();
     }
 
-    function exportData() {
-        saveData();
-        const d = { 
-            sd: document.getElementById('start-date').value, 
-            h: document.getElementById('h-val').innerText, 
-            w: document.getElementById('w-val').innerText, 
-            t: document.getElementById('target-val').innerText, 
-            u: document.getElementById('user-name').innerText, 
-            content: JSON.parse(localStorage.getItem('shred_content')) 
-        };
-        navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(d)))).then(() => alert('同步码已复制！'));
+    function goNext() {
+        save(); const d = new Date(activeDate); d.setDate(d.getDate() + 7);
+        activeDate = d.toISOString().split('T')[0]; document.getElementById('start-date').value = activeDate;
+        renderGrid(); window.scrollTo(0,0);
     }
 
-    function importData() {
-        const code = prompt('粘贴同步码:'); if(!code) return;
+    // 单个同步
+    function expSingle() {
+        save(); const pre = `shred_v10_${activePID}_`;
+        const d = { start: activeDate, h: document.getElementById('h-val').innerText, w: document.getElementById('w-val').innerText, t: document.getElementById('target-val').innerText, u: document.getElementById('user-name').innerText, content: JSON.parse(localStorage.getItem(pre + 'history'))[activeDate] };
+        navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(d)))).then(() => alert('当前档案同步码已复制！'));
+    }
+    function impSingle() {
+        const code = prompt('粘贴单人同步码：'); if(!code) return;
         try {
             const d = JSON.parse(decodeURIComponent(atob(code)));
-            localStorage.setItem('shred_content', JSON.stringify(d.content || {}));
-            localStorage.setItem('shred_h-val', d.h || "180");
-            localStorage.setItem('shred_w-val', d.w || "72.0");
-            localStorage.setItem('shred_target-val', d.t || d.tw || "70.0");
-            localStorage.setItem('shred_user-name', d.u || d.c || "用户");
-            localStorage.setItem('shred_start', d.sd || d.start || "");
+            const pre = `shred_v10_${activePID}_`;
+            const hist = JSON.parse(localStorage.getItem(pre + 'history') || '{}');
+            hist[d.start || d.sd] = d.content; localStorage.setItem(pre + 'history', JSON.stringify(hist));
+            const list = JSON.parse(localStorage.getItem(pre + 'list') || '[]');
+            if(!list.includes(d.start || d.sd)) list.push(d.start || d.sd); localStorage.setItem(pre + 'list', JSON.stringify(list));
+            localStorage.setItem(pre+'h-val', d.h); localStorage.setItem(pre+'w-val', d.w); localStorage.setItem(pre+'target-val', d.t||d.tw); localStorage.setItem(pre+'user-name', d.u||d.c);
             location.reload();
-        } catch(e) { alert('同步码格式不兼容，请确认复制完整'); }
+        } catch(e) { alert('单人同步码无效'); }
+    }
+
+    // 全量备份
+    function expFull() {
+        save(); const profiles = JSON.parse(localStorage.getItem('shred_v10_profiles') || '["p1"]');
+        const all = { profiles, activeID: activePID, data: {} };
+        profiles.forEach(pid => { ['history', 'list', 'h-val', 'w-val', 'target-val', 'user-name'].forEach(k => { all.data[`shred_v10_${pid}_${k}`] = localStorage.getItem(`shred_v10_${pid}_${k}`); }); });
+        navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(all)))).then(() => alert('全系统备份码已复制！'));
+    }
+    function impFull() {
+        const code = prompt('⚠️ 警告：导入全系统码将覆盖所有档案！确认请粘贴：'); if(!code) return;
+        try {
+            const d = JSON.parse(decodeURIComponent(atob(code)));
+            if (!d.profiles) return alert('格式错误：这不是全量码');
+            localStorage.setItem('shred_v10_profiles', JSON.stringify(d.profiles));
+            localStorage.setItem('shred_v10_pid', d.activeID);
+            Object.keys(d.data).forEach(k => localStorage.setItem(k, d.data[k]));
+            location.reload();
+        } catch(e) { alert('全系统码无效'); }
     }
 
     window.onload = init;
