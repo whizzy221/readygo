@@ -45,9 +45,17 @@
         .e-label { font-size: 0.55rem; font-weight: 900; color: #999; text-transform: uppercase; text-align: center; }
         .e-val { font-size: 1.1rem; font-weight: 950; text-align: center; outline: none; }
         .e-gap { grid-column: span 2; border-top: 1px solid #eee; padding-top: 5px; text-align: center; color: var(--orange); font-weight: 900; font-size: 0.75rem; }
+        
+        /* 蓝色饮水模块还原 */
+        .water-box { grid-column: span 2; border-top: 1px dashed #ddd; padding-top: 5px; display: flex; justify-content: space-between; align-items: center; }
 
         .section-header { font-size: 0.75rem; font-weight: 950; text-transform: uppercase; color: var(--orange); margin: 15px 0 8px 0; border-left: 3px solid var(--orange); padding-left: 8px; }
-        .diet-timeline { font-size: 0.85rem; font-weight: 600; line-height: 1.6; outline: none; min-height: 40px; white-space: pre-wrap; }
+        
+        /* 饮食时间轴排版还原 */
+        .diet-timeline { margin-bottom: 15px; }
+        .diet-row { display: grid; grid-template-columns: 45px 1fr; gap: 8px; margin-bottom: 4px; }
+        .t-time { font-size: 0.7rem; font-weight: 900; color: #bbb; }
+        .t-content { font-size: 0.85rem; font-weight: 600; outline: none; border-bottom: 1px solid #f2f2f2; }
 
         .training-card, .summary-card { background: #fdfdfd; border: 1px solid #f4f4f4; border-radius: 2px; padding: 12px; font-size: 0.88rem; font-weight: 600; color: #222; line-height: 1.6; white-space: pre-wrap; outline: none; min-height: 100px; }
         .summary-card { background: #fffcf0; font-style: italic; border-left: 3px solid #666; }
@@ -67,17 +75,17 @@
 <header>
     <div class="brand"><h1>SHRED.LOG</h1><p>Evolutionary Fitness</p></div>
     <div class="meta-grid">
-        <div class="meta-box"><div class="m-label">Height / 身高 (cm)</div><div class="m-val" contenteditable="true" id="h-val">173</div></div>
-        <div class="meta-box"><div class="m-label">Base / 基准 (kg)</div><div class="m-val" contenteditable="true" id="w-val">77.35</div></div>
+        <div class="meta-box"><div class="m-label">Height / 身高 (cm)</div><div class="m-val" contenteditable="true" id="h-val">180</div></div>
+        <div class="meta-box"><div class="m-label">Base / 基准 (kg)</div><div class="m-val" contenteditable="true" id="w-val">72.0</div></div>
         <div class="meta-box"><div class="m-label">Goal / 目标 (kg)</div><div class="m-val" contenteditable="true" style="color:var(--orange)" id="target-val">70.0</div></div>
         <div class="meta-box"><div class="m-label">BMI 指数</div><div class="m-val" id="bmi-val">--</div></div>
-        <div class="meta-box"><div class="m-label">User / 用户</div><div class="m-val" contenteditable="true" id="user-name">小何</div></div>
+        <div class="meta-box"><div class="m-label">User / 用户</div><div class="m-val" contenteditable="true" id="user-name">用户</div></div>
     </div>
 </header>
 
 <div class="global-controls">
-    <div>起始日：<input type="date" id="start-date" onchange="renderGrid(); recalc();"></div>
-    <div id="dist-label" style="color:var(--orange)">等待数据同步...</div>
+    <div>起始日设定：<input type="date" id="start-date" onchange="renderGrid(); recalc();"></div>
+    <div id="dist-label" style="color:var(--orange)">等待数据导入...</div>
 </div>
 
 <div class="weekly-grid" id="week-container"></div>
@@ -92,14 +100,15 @@
 
 <script>
     const WEEKDAYS = ['周一 MON', '周二 TUE', '周三 WED', '周四 THU', '周五 FRI', '周六 SAT', '周日 SUN'];
+    const DEFAULT_TIMES = ['08:00', '12:00', '16:00', '20:00'];
 
     function init() {
-        // 自动计算本周一作为默认日期
         const d = new Date();
         const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
         const monday = new Date(d.setDate(diff)).toISOString().split('T')[0];
         
         document.getElementById('start-date').value = localStorage.getItem('shred_start') || monday;
+        
         ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => {
             const val = localStorage.getItem('shred_' + id);
             if(val) document.getElementById(id).innerText = val;
@@ -120,15 +129,14 @@
             const cur = new Date(start); cur.setDate(start.getDate() + i);
             const d = saved[i] || {};
             
-            // 彻底解决 undefined：通过 || "" 强制兜底
+            // 彻底兼容旧版和新版字段，确保导入不报错
             const weight = d.weight || d.w || "";
-            const caloriesIn = d.in || 0;
-            const caloriesOut = d.out || 0;
-            const mood = d.mood || 5;
-            const fatigue = d.fatigue || 3;
-            const training = d.training || d.train || "";
-            const summary = d.summary || d.sum || "";
-            const dietText = d.dietText || (d.diet ? d.diet.map(m => m[1]).join('\n') : "");
+            const cin = d.in || 0, cout = d.out || 0;
+            const water = d.water || "2.5";
+            const mood = d.mood || 5, fatg = d.fatigue || 3;
+            const train = d.training || d.train || "";
+            const sum = d.summary || d.sum || "";
+            const dietArr = d.diet || DEFAULT_TIMES.map(t => [t, '']);
 
             const card = document.createElement('div');
             card.className = 'day-card';
@@ -140,19 +148,20 @@
                 </div>
                 <div class="status-box">
                     <div class="slider-group"><div class="slider-label"><span>Mood 心情</span><span>${mood}</span></div><input type="range" min="1" max="10" value="${mood}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
-                    <div class="slider-group"><div class="slider-label"><span>Fatigue 疲劳度</span><span>${fatigue}</span></div><input type="range" min="1" max="10" value="${fatigue}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
+                    <div class="slider-group"><div class="slider-label"><span>Fatigue 疲劳度</span><span>${fatg}</span></div><input type="range" min="1" max="10" value="${fatg}" oninput="this.previousElementSibling.lastElementChild.innerText=this.value"></div>
                 </div>
                 <div class="energy-grid">
-                    <div class="e-item"><div class="e-label">入</div><div class="e-val" contenteditable="true" data-field="in">${caloriesIn}</div></div>
-                    <div class="e-item"><div class="e-label">出</div><div class="e-val" contenteditable="true" data-field="out">${caloriesOut}</div></div>
+                    <div class="e-item"><div class="e-label">入</div><div class="e-val" contenteditable="true" data-field="in">${cin}</div></div>
+                    <div class="e-item"><div class="e-label">出</div><div class="e-val" contenteditable="true" data-field="out">${cout}</div></div>
                     <div class="e-gap">缺口: <span class="gap-val">0</span> kcal</div>
+                    <div class="water-box"><div style="font-size:0.55rem;font-weight:900;color:var(--blue)">WATER / 饮水</div><div><span contenteditable="true" data-field="water" style="font-weight:900;color:var(--blue)">${water}</span> <small style="color:var(--blue)">L</small></div></div>
                 </div>
                 <div class="section-header">Diet / 饮食记录</div>
-                <div class="diet-timeline" contenteditable="true" data-field="diet">${dietText}</div>
+                <div class="diet-timeline">${dietArr.map(m=>`<div class="diet-row"><div class="t-time" contenteditable="true">${m[0]}</div><div class="t-content" contenteditable="true" data-field="meal">${m[1]}</div></div>`).join('')}</div>
                 <div class="section-header">Training / 训练执行</div>
-                <div class="training-card" contenteditable="true" data-field="training">${training}</div>
+                <div class="training-card" contenteditable="true" data-field="training">${train}</div>
                 <div class="section-header">Reflection / 每日总结</div>
-                <div class="summary-card" contenteditable="true" data-field="summary">${summary}</div>
+                <div class="summary-card" contenteditable="true" data-field="summary">${sum}</div>
             `;
             container.appendChild(card);
             card.addEventListener('input', () => { updateGap(card); recalc(); });
@@ -172,13 +181,13 @@
                 latestW = parseFloat(v); hasV = true;
                 const diff = (latestW - bW).toFixed(1);
                 el.nextElementSibling.innerText = (diff > 0 ? '+' : '') + diff + 'kg';
-            } else { el.nextElementSibling.innerText = "--"; } // 解决删除残留 Bug
+            } else { el.nextElementSibling.innerText = "--"; }
         });
 
         if(h > 0 && latestW > 0) document.getElementById('bmi-val').innerText = (latestW / (h*h)).toFixed(1);
         const prog = hasV ? Math.min(100, Math.max(0, (Math.abs(bW - latestW) / Math.abs(bW - tW)) * 100)) : 0;
         document.getElementById('goal-progress-bar').style.width = prog + '%';
-        document.getElementById('dist-label').innerText = hasV ? `已完成: ${Math.round(prog)}% (差 ${(latestW - tW).toFixed(1)}kg)` : "数据已同步：小何";
+        document.getElementById('dist-label').innerText = hasV ? `已完成: ${Math.round(prog)}% (差 ${(latestW - tW).toFixed(1)}kg)` : "等待数据...";
     }
 
     function updateGap(card) {
@@ -191,16 +200,9 @@
         const cards = document.querySelectorAll('.day-card');
         const content = {};
         cards.forEach((card, i) => {
+            const diet = []; card.querySelectorAll('.diet-row').forEach(row => diet.push([row.querySelector('.t-time').innerText, row.querySelector('[data-field="meal"]').innerText]));
             const s = card.querySelectorAll('input[type="range"]');
-            content[i] = { 
-                weight: card.querySelector('[data-field="weight"]').innerText,
-                in: card.querySelector('[data-field="in"]').innerText,
-                out: card.querySelector('[data-field="out"]').innerText,
-                mood: s[0].value, fatigue: s[1].value,
-                training: card.querySelector('[data-field="training"]').innerText,
-                summary: card.querySelector('[data-field="summary"]').innerText,
-                dietText: card.querySelector('[data-field="diet"]').innerText
-            };
+            content[i] = { weight: card.querySelector('[data-field="weight"]').innerText, in: card.querySelector('[data-field="in"]').innerText, out: card.querySelector('[data-field="out"]').innerText, water: card.querySelector('[data-field="water"]').innerText, mood: s[0].value, fatigue: s[1].value, training: card.querySelector('[data-field="training"]').innerText, summary: card.querySelector('[data-field="summary"]').innerText, diet: diet };
         });
         localStorage.setItem('shred_content', JSON.stringify(content));
         ['h-val', 'w-val', 'target-val', 'user-name'].forEach(id => localStorage.setItem('shred_' + id, document.getElementById(id).innerText));
@@ -210,14 +212,7 @@
 
     function exportData() {
         saveLocal();
-        const d = { 
-            sd: document.getElementById('start-date').value, 
-            h: document.getElementById('h-val').innerText, 
-            w: document.getElementById('w-val').innerText, 
-            t: document.getElementById('target-val').innerText, 
-            u: "小何", 
-            content: JSON.parse(localStorage.getItem('shred_content')) 
-        };
+        const d = { sd: document.getElementById('start-date').value, h: document.getElementById('h-val').innerText, w: document.getElementById('w-val').innerText, t: document.getElementById('target-val').innerText, u: document.getElementById('user-name').innerText, content: JSON.parse(localStorage.getItem('shred_content')) };
         navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(d)))).then(() => alert('全量同步码已复制！'));
     }
 
@@ -225,15 +220,15 @@
         const code = prompt('粘贴同步码:'); if(!code) return;
         try {
             const d = JSON.parse(decodeURIComponent(atob(code)));
-            // 核心兼容性逻辑：管你是旧版还是新版，全速匹配
+            // 核心兼容性映射：确保旧码数据能对应到新版布局
             localStorage.setItem('shred_content', JSON.stringify(d.content || {}));
-            localStorage.setItem('shred_h-val', d.h || "173");
-            localStorage.setItem('shred_w-val', d.w || "77.35");
+            localStorage.setItem('shred_h-val', d.h || "180");
+            localStorage.setItem('shred_w-val', d.w || "72.0");
             localStorage.setItem('shred_target-val', d.t || d.tw || "70.0");
-            localStorage.setItem('shred_user-name', "小何");
-            localStorage.setItem('shred_start', d.sd || d.start || "2026-02-26");
+            localStorage.setItem('shred_user-name', d.u || d.c || "用户");
+            localStorage.setItem('shred_start', d.sd || d.start || "");
             location.reload();
-        } catch(e) { alert('同步码无效'); }
+        } catch(e) { alert('同步码无效，请确认复制完整'); }
     }
 
     window.onload = init;
